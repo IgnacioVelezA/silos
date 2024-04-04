@@ -1,0 +1,8 @@
+Pruebas alineación:
+
+Se deja el radar fijo midiendo constantemente y ploteando en tiempo real. El radar se ubica a 
+11.5m a una pared con tal de que 1.5 veces el beamwidth coincida con una plancha de madera de
+90cmx100cm. 
+
+La plancha de madera se coloca progresivamente frente al radar para comprobar que el laser
+esté alineado con el beam.

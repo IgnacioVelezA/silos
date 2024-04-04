@@ -1,0 +1,2 @@
+2 Pruebas: 	-1 de escaneo unicamente vertical, angulo elevación 30 grados
+		-1 de escaneo unicamente horizontal, angulo elevación 30 grados.

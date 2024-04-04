@@ -1,0 +1,7 @@
+2obstaculos6m_3_2023-08-31
+
+r0 = 1.5; rmax = 30; 
+
+Midiendo la muralla del estacionamiento a 12 metros con 2 objetos (ver Setup_2023-08-31#1)
+cada uno a 5 metros de la muralla y separados por 2.4m
+-------------------------------
