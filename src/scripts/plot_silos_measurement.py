@@ -6,7 +6,7 @@ import itertools
 import csv, ipdb
 from shapely.geometry import Point
 from geopandas import GeoSeries
-from src.scripts import distanceFinder
+from src.test_scripts import distanceFinder
 import os
 
 # Polyfit from https://stackoverflow.com/questions/7997152/python-3d-polynomial-surface-fit-order-dependent
