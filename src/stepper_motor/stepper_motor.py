@@ -251,11 +251,11 @@ if __name__ == '__main__':
 
 
     az_motor = stepper_motor(id = 1,speed=300, max_speed=400, acceleration=100)
-    az_motor.add_limit_switch(12,-90)
+    #az_motor.add_limit_switch(12,-90)
     az_motor.add_limit_switch(24,90)
     time.sleep(1)
 
     el_motor = stepper_motor(id = 2, speed=300, max_speed=400, acceleration=100)
-    el_motor.add_limit_switch(18,-44)
+    #el_motor.add_limit_switch(18,-44)
     el_motor.add_limit_switch(23,44)
     time.sleep(1)
