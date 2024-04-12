@@ -257,5 +257,10 @@ if __name__ == '__main__':
 
     el_motor = stepper_motor(id = 2, speed=300, max_speed=400, acceleration=100)
     #el_motor.add_limit_switch(18,-44)
-    el_motor.add_limit_switch(23,44)
+    try:
+        el_motor.add_limit_switch(23,44)
+    
+    except Exception as e:
+        print("Error:", e)
+
     time.sleep(1)
