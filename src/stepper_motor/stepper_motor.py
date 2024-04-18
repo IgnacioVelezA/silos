@@ -1,5 +1,6 @@
 import src.stepper_motor.serial_arduino as serial_arduino
-import RPi.GPIO as GPIO
+#import RPi.GPIO as GPIO
+import gpiozero #<<<<<<<<<<<<<<<<<<<<-
 import time
 from datetime import datetime, timedelta
 import argparse
@@ -46,21 +47,25 @@ class stepper_motor:
         # Waits until the button is pressed
         while not LS_reached:
             for LS_pin in self.limit_switch_list:
-                if GPIO.event_detected(LS_pin):
+                button = Button(LS_pin)
+                #---------------------------------------------------
+                #if GPIO.event_detected(LS_pin):
                     #Checks if the event is a LS pressed
-                    time.sleep(0.1)
-                    if not GPIO.input(LS_pin):
-                        print("A button was pressed")
-                        #Checks if the limit switch is OK for initialization
-                        if self.check_correct_limit_switch_stop(LS_pin,dir):
-                            LS_reached = True
-                            LS_index = self.limit_switch_list.index(LS_pin)
-                            LS_angle = self.limit_switch_angle_list[LS_index]
-                            print("Setting offset at "+ str(LS_angle))
-                        else:
-                            self.ignore_stop = True
-                            self.return_from_wrong_LS(dir)
-                            self.ignore_stop = False
+                    #time.sleep(0.1)
+                #if not GPIO.input(LS_pin):
+                #---------------------------------------------------
+                if button.is_pressed:
+                    print("A button was pressed")
+                    #Checks if the limit switch is OK for initialization
+                    if self.check_correct_limit_switch_stop(LS_pin,dir):
+                        LS_reached = True
+                        LS_index = self.limit_switch_list.index(LS_pin)
+                        LS_angle = self.limit_switch_angle_list[LS_index]
+                        print("Setting offset at "+ str(LS_angle))
+                    else:
+                        self.ignore_stop = True
+                        self.return_from_wrong_LS(dir)
+                        self.ignore_stop = False
 
         
         # Assuring the motor is correctly reading the angle
@@ -73,6 +78,7 @@ class stepper_motor:
         print("Offset used: "+ str(angle_read*(-1)))
         self.is_initialized = True
         print("Finished initializing device " + str(self.id))
+
         #setting normal speeds 
         self.stop()
         time.sleep(0.1)
@@ -192,9 +198,16 @@ class stepper_motor:
         """
         self.limit_switch_list.append(raspi_pin)
         self.limit_switch_angle_list.append(angle)
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setup(raspi_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-        GPIO.add_event_detect(raspi_pin, GPIO.BOTH, callback=self.stop, bouncetime=100)
+
+        button = Button(raspi_pin, pull_up=True)  # Set pull_up to True to enable the internal pull-up resistor
+        button.when_pressed = self.stop  # Attach the stop method to the button's when_pressed event
+
+
+        # #--------------------------------------------------------------
+        # GPIO.setmode(GPIO.BCM)
+        # GPIO.setup(raspi_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        # GPIO.add_event_detect(raspi_pin, GPIO.BOTH, callback=self.stop, bouncetime=100)
+        # -----------------------------------------------------------------
 
     def read_angle(self, use_offset = True):
         angle_response = serial_arduino.send_cmd(self.id,"rdangle","",SERIAL_WAIT_TIME)
@@ -240,7 +253,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    GPIO.cleanup()
+    gpiozero.close()
 
     serial_arduino.open_serial(args.arduino_usb_port)
     if serial_arduino.is_serial_open():

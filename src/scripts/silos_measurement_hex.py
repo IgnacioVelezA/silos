@@ -3,9 +3,11 @@
 from src.radar_communication import serial_radar
 from src.stepper_motor import serial_arduino
 from src.stepper_motor import stepper_motor
-import RPi.GPIO as GPIO
+#import RPi.GPIO as GPIO
+import gpiozero
 import time
 import math
+
 from datetime import datetime, timedelta, date
 import pickle as pkl
 import argparse
@@ -123,7 +125,7 @@ if __name__ == '__main__':
         print("Could not open serial radar port, FATAL ERROR")
 
     # Initializing radar motors, setting PID and limit switches
-    GPIO.cleanup()
+    gpiozero.close()
     serial_arduino.open_serial(args.arduino_usb_port)
     if serial_arduino.is_serial_open():
         print("Serial arduino port open succesfully")
