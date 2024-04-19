@@ -254,7 +254,11 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    #gpiozero.close()
+    for button in el_motor.limit_switch_objects:
+        button.close()
+    
+    for button in az_motor.limit_switch_objects:
+        button.close()
 
     serial_arduino.open_serial(args.arduino_usb_port)
     if serial_arduino.is_serial_open():
