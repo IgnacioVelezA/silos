@@ -254,12 +254,6 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    for button in el_motor.limit_switch_objects:
-        button.close()
-    
-    for button in az_motor.limit_switch_objects:
-        button.close()
-
     serial_arduino.open_serial(args.arduino_usb_port)
     if serial_arduino.is_serial_open():
         print("Serial arduino port open succesfully")
@@ -275,6 +269,12 @@ if __name__ == '__main__':
 
     el_motor = stepper_motor(id = 2, speed=300, max_speed=400, acceleration=100)
     #el_motor.add_limit_switch(18,-44)
+    
+    for button in el_motor.limit_switch_objects:
+        button.close()
+    
+    for button in az_motor.limit_switch_objects:
+        button.close()
     try:
         el_motor.add_limit_switch(24,44)
     
