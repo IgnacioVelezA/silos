@@ -277,7 +277,7 @@ if __name__ == '__main__':
         for button in az_motor.limit_switch_objects:
             button.close()
         try:
-            el_motor.add_limit_switch(10,44)
+            el_motor.add_limit_switch(23,44)
         
         except Exception as e:
             print("Error:", e)
