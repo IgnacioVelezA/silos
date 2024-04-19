@@ -200,7 +200,7 @@ class stepper_motor:
         self.limit_switch_angle_list.append(angle)
 
         button = gpiozero.Button(raspi_pin, pull_up=True)  # Set pull_up to True to enable the internal pull-up resistor
-        button.when_pressed = self.stop()  # Attach the stop method to the button's when_pressed event
+        button.when_pressed = self.stop  # Attach the stop method to the button's when_pressed event
 
 
         # #--------------------------------------------------------------
