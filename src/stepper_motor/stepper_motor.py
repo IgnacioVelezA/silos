@@ -253,7 +253,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    gpiozero.close()
+    #gpiozero.close()
 
     serial_arduino.open_serial(args.arduino_usb_port)
     if serial_arduino.is_serial_open():
