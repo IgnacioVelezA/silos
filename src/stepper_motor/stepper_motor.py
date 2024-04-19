@@ -249,36 +249,44 @@ class stepper_motor:
 
 if __name__ == '__main__':
     # Initializing radar motors, setting PID and limit switches
-    parser = argparse.ArgumentParser(description='for debugging stepper motors')
-    parser.add_argument('arduino_usb_port', help='arduino usb port for serial comm, tipically /dev/ttyUSB1')
-
-    args = parser.parse_args()
-
-    serial_arduino.open_serial(args.arduino_usb_port)
-    if serial_arduino.is_serial_open():
-        print("Serial arduino port open succesfully")
-    else:
-        print("Could not open arduino radar port, FATAL ERROR")
-    time.sleep(1)
-
-
-    az_motor = stepper_motor(id = 1,speed=300, max_speed=400, acceleration=100)
-    #az_motor.add_limit_switch(12,-90)
-    #az_motor.add_limit_switch(24,90)
-    time.sleep(1)
-
-    el_motor = stepper_motor(id = 2, speed=300, max_speed=400, acceleration=100)
-    #el_motor.add_limit_switch(18,-44)
-
-    for button in el_motor.limit_switch_objects:
-        button.close()
-    
-    for button in az_motor.limit_switch_objects:
-        button.close()
     try:
-        el_motor.add_limit_switch(24,44)
-    
-    except Exception as e:
-        print("Error:", e)
+        parser = argparse.ArgumentParser(description='for debugging stepper motors')
+        parser.add_argument('arduino_usb_port', help='arduino usb port for serial comm, tipically /dev/ttyUSB1')
 
-    time.sleep(1)
+        args = parser.parse_args()
+
+        serial_arduino.open_serial(args.arduino_usb_port)
+        if serial_arduino.is_serial_open():
+            print("Serial arduino port open succesfully")
+        else:
+            print("Could not open arduino radar port, FATAL ERROR")
+        time.sleep(1)
+
+
+        az_motor = stepper_motor(id = 1,speed=300, max_speed=400, acceleration=100)
+        #az_motor.add_limit_switch(12,-90)
+        #az_motor.add_limit_switch(24,90)
+        time.sleep(1)
+
+        el_motor = stepper_motor(id = 2, speed=300, max_speed=400, acceleration=100)
+        #el_motor.add_limit_switch(18,-44)
+
+        for button in el_motor.limit_switch_objects:
+            button.close()
+        
+        for button in az_motor.limit_switch_objects:
+            button.close()
+        try:
+            el_motor.add_limit_switch(10,44)
+        
+        except Exception as e:
+            print("Error:", e)
+
+        time.sleep(1)
+    finally:
+        # Close the Button objects to release the GPIO pins
+        for button in el_motor.limit_switch_objects:
+            button.close()
+
+        for button in az_motor.limit_switch_objects:
+            button.close()
