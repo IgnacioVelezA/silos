@@ -47,8 +47,8 @@ class stepper_motor:
         LS_reached = False
         # Waits until the button is pressed
         while not LS_reached:
-            for LS_pin in self.limit_switch_list:
-                button = gpiozero.Button(LS_pin)
+            for button in self.limit_switch_objects:
+                LS_pin = button.pin.number
                 #---------------------------------------------------
                 #if GPIO.event_detected(LS_pin):
                     #Checks if the event is a LS pressed
@@ -269,7 +269,7 @@ if __name__ == '__main__':
 
     el_motor = stepper_motor(id = 2, speed=300, max_speed=400, acceleration=100)
     #el_motor.add_limit_switch(18,-44)
-    
+
     for button in el_motor.limit_switch_objects:
         button.close()
     
