@@ -52,22 +52,22 @@ class stepper_motor:
             for LS_pin in self.limit_switch_list:
                 #---------------------------------------------------
                 if GPIO.event_detected(LS_pin):
-                     Checks if the event is a LS pressed
+                     #Checks if the event is a LS pressed
                      time.sleep(0.1)
-                if not GPIO.input(LS_pin):
-                #---------------------------------------------------
-                #if button.is_pressed:
-                    print("A button was pressed")
-                    #Checks if the limit switch is OK for initialization
-                    if self.check_correct_limit_switch_stop(LS_pin,dir):
-                        LS_reached = True
-                        LS_index = self.limit_switch_list.index(LS_pin)
-                        LS_angle = self.limit_switch_angle_list[LS_index]
-                        print("Setting offset at "+ str(LS_angle))
-                    else:
-                        self.ignore_stop = True
-                        self.return_from_wrong_LS(dir)
-                        self.ignore_stop = False
+                    if not GPIO.input(LS_pin):
+                    #---------------------------------------------------
+                    #if button.is_pressed:
+                        print("A button was pressed")
+                        #Checks if the limit switch is OK for initialization
+                        if self.check_correct_limit_switch_stop(LS_pin,dir):
+                            LS_reached = True
+                            LS_index = self.limit_switch_list.index(LS_pin)
+                            LS_angle = self.limit_switch_angle_list[LS_index]
+                            print("Setting offset at "+ str(LS_angle))
+                        else:
+                            self.ignore_stop = True
+                            self.return_from_wrong_LS(dir)
+                            self.ignore_stop = False
 
 
         # Assuring the motor is correctly reading the angle
