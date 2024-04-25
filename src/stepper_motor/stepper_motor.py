@@ -1,6 +1,6 @@
 import src.stepper_motor.serial_arduino as serial_arduino
-#import RPi.GPIO as GPIO
-import gpiozero #<<<<<<<<<<<<<<<<<<<<-
+import RPi.GPIO as GPIO
+#import gpiozero #<<<<<<<<<<<<<<<<<<<<-
 import time
 from datetime import datetime, timedelta
 import argparse
@@ -35,27 +35,28 @@ class stepper_motor:
         to one side until LS is reached, then it stops the motor and
         sets the corresponding LS angle offset.
         """
-        #setting slow speeds 
+        #setting slow speeds
         self.set_motor_max_speed(max_speed)
         self.set_motor_speed(speed)
         self.set_motor_acceleration(acceleration)
         # Making the motor turn
-        
+
         target_angle = self.read_angle()+360*dir
         self.move(target_angle,override_initialization=True)
-        
+
         LS_reached = False
         # Waits until the button is pressed
         while not LS_reached:
-            for button in self.limit_switch_objects:
-                LS_pin = button.pin.number
+            # for button in self.limit_switch_objects:
+                #LS_pin = button.pin.number
+            for LS_pin in self.limit_switch_list:
                 #---------------------------------------------------
-                #if GPIO.event_detected(LS_pin):
-                    #Checks if the event is a LS pressed
-                    #time.sleep(0.1)
-                #if not GPIO.input(LS_pin):
+                if GPIO.event_detected(LS_pin):
+                     Checks if the event is a LS pressed
+                     time.sleep(0.1)
+                if not GPIO.input(LS_pin):
                 #---------------------------------------------------
-                if button.is_pressed:
+                #if button.is_pressed:
                     print("A button was pressed")
                     #Checks if the limit switch is OK for initialization
                     if self.check_correct_limit_switch_stop(LS_pin,dir):
@@ -68,7 +69,7 @@ class stepper_motor:
                         self.return_from_wrong_LS(dir)
                         self.ignore_stop = False
 
-        
+
         # Assuring the motor is correctly reading the angle
         angle_read = self.read_angle(use_offset=False)
         time.sleep(0.1)
@@ -80,7 +81,7 @@ class stepper_motor:
         self.is_initialized = True
         print("Finished initializing device " + str(self.id))
 
-        #setting normal speeds 
+        #setting normal speeds
         self.stop()
         time.sleep(0.1)
         self.set_motor_max_speed(self.max_speed)
@@ -114,7 +115,7 @@ class stepper_motor:
         """
         Stops the motor. If this function is called by an interrupt, it checks if the limit switch
         is being pressed. If this function was called internally, it stops the motor.
-        If the motor is initializing, started in an invalid zone and hit a wrong limit switch, 
+        If the motor is initializing, started in an invalid zone and hit a wrong limit switch,
         ignore_stop is True and the motor doesn't stop.
         """
         if channel != 0:
@@ -169,7 +170,7 @@ class stepper_motor:
             time.sleep(MOTOR_STATUS_POLLING_TIME)
             if (abs(self.read_angle(use_offset)-target_angle) < ANGLE_ERROR):
                 at_final_position = True
-            
+
         return at_final_position
 
     def return_from_wrong_LS(self,dir):
@@ -191,7 +192,7 @@ class stepper_motor:
             self.wait_for_target_angle(target_angle, use_offset=False)
             self.move(target_angle-360)
 
-    
+
     def add_limit_switch(self, raspi_pin, angle):
         """
         Adds a limit switch to the motor, attached to the corresponding raspi_pin,
@@ -204,10 +205,10 @@ class stepper_motor:
         button.when_pressed = self.stop  # Attach the stop method to the button's when_pressed event
 
 
-        # #--------------------------------------------------------------
-        # GPIO.setmode(GPIO.BCM)
-        # GPIO.setup(raspi_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-        # GPIO.add_event_detect(raspi_pin, GPIO.BOTH, callback=self.stop, bouncetime=100)
+        #--------------------------------------------------------------
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(raspi_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        GPIO.add_event_detect(raspi_pin, GPIO.BOTH, callback=self.stop, bouncetime=100)
         # -----------------------------------------------------------------
 
     def read_angle(self, use_offset = True):
@@ -229,7 +230,7 @@ class stepper_motor:
         return final_angle
 
     def set_id(self, id):
-        self.id = id       
+        self.id = id
 
     def set_motor_speed(self,speed):
         serial_arduino.send_cmd(self.id,"setspd",speed,SERIAL_WAIT_TIME)
@@ -264,29 +265,24 @@ if __name__ == '__main__':
 
 
         az_motor = stepper_motor(id = 1,speed=300, max_speed=400, acceleration=100)
-        #az_motor.add_limit_switch(12,-90)
+        az_motor.add_limit_switch(12,-90)
         #az_motor.add_limit_switch(24,90)
         time.sleep(1)
 
         el_motor = stepper_motor(id = 2, speed=300, max_speed=400, acceleration=100)
         #el_motor.add_limit_switch(18,-44)
 
-        for button in el_motor.limit_switch_objects:
-            button.close()
-        
-        for button in az_motor.limit_switch_objects:
-            button.close()
-        try:
-            el_motor.add_limit_switch(23,44)
-        
-        except Exception as e:
-            print("Error:", e)
+        # try:
+        el_motor.add_limit_switch(23,44)
+
+        # except Exception as e:
+        #     print("Error:", e)
 
         time.sleep(1)
-    finally:
-        # Close the Button objects to release the GPIO pins
-        for button in el_motor.limit_switch_objects:
-            button.close()
+    # finally:
+    #     # Close the Button objects to release the GPIO pins
+    #     for button in el_motor.limit_switch_objects:
+    #         button.close()
 
-        for button in az_motor.limit_switch_objects:
-            button.close()
+    #     for button in az_motor.limit_switch_objects:
+    #         button.close()
