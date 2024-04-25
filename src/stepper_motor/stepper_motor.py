@@ -53,10 +53,8 @@ class stepper_motor:
                 #---------------------------------------------------
                 if GPIO.event_detected(LS_pin):
                      #Checks if the event is a LS pressed
-                     time.sleep(0.1)
+                    time.sleep(0.1)
                     if not GPIO.input(LS_pin):
-                    #---------------------------------------------------
-                    #if button.is_pressed:
                         print("A button was pressed")
                         #Checks if the limit switch is OK for initialization
                         if self.check_correct_limit_switch_stop(LS_pin,dir):
