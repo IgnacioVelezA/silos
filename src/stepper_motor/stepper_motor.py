@@ -197,12 +197,8 @@ class stepper_motor:
         with its physical angle. If the limit switch is pressed, the motor stops.
         """
         self.limit_switch_list.append(raspi_pin)
-        self.limit_switch_angle_list.append(angle)
-        button = gpiozero.Button(raspi_pin, pull_up=True)  # Set pull_up to True to enable the internal pull-up resistor
-        self.limit_switch_objects.append(button)
-        button.when_pressed = self.stop  # Attach the stop method to the button's when_pressed event
-
-
+        self.limit_switch_angle_list.append(angle)  # Set pull_up to True to enable the internal pull-up resistor
+        #button.when_pressed = self.stop  # Attach the stop method to the button's when_pressed event
         #--------------------------------------------------------------
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(raspi_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
