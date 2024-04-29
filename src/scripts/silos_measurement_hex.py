@@ -12,7 +12,6 @@ from datetime import datetime, timedelta, date
 import pickle as pkl
 import argparse
 from src.trajectory import hex_trajectory
-from src.test_scripts import special_trajectorys
 
 MOTOR_STATUS_POLLING_TIME = 0.1     # in seconds
 
