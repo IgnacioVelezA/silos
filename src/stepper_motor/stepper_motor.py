@@ -257,7 +257,7 @@ if __name__ == '__main__':
         print("Could not open arduino radar port, FATAL ERROR")
     time.sleep(1)
 
-
+    GPIO.cleanup()
     az_motor = stepper_motor(id = 1,speed=300, max_speed=400, acceleration=100)
     az_motor.add_limit_switch(12,-90)
     az_motor.add_limit_switch(24,90)
