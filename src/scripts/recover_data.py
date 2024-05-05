@@ -46,40 +46,76 @@ if __name__=='__main__':
     command = ['scp',  server, path]
     subprocess.run(command)
 
-    file = open(path, 'rb')
+    # file = open(path, 'rb')
 
-    traj_angle_dict = 0
-    distances_date_tuple_list = []
-    file_len_counter = 0
-    while True:
-        try:
-            if file_len_counter == 0:
-                traj_angle_dict = pkl.load(file)
-            else:
-                distances_date_tuple_list.append(pkl.load(file))
-            file_len_counter += 1
-        except:
-            break
-    file.close()
+    # traj_angle_dict = 0
+    # distances_date_tuple_list = []
+    # file_len_counter = 0
+    # while True:
+    #     try:
+    #         if file_len_counter == 0:
+    #             traj_angle_dict = pkl.load(file)
+    #         else:
+    #             distances_date_tuple_list.append(pkl.load(file))
+    #         file_len_counter += 1
+    #     except:
+    #         break
+    # file.close()
 
-    if save:
-        pathCSV = path[:-4]+'.csv'
+    # if save:
+    #     pathCSV = path[:-4]+'.csv'
 
-        with open(pathCSV, 'w') as csvfile:#, newline=''
+    #     with open(pathCSV, 'w') as csvfile:#, newline=''
         
-            newCSV = csv.writer(csvfile)
-            params = traj_angle_dict['params']
-            traj = traj_angle_dict['traj']
-            n_points = len(distances_date_tuple_list[0])
-            print(f'n_point = {n_points}')
-            listCSV = [distance_vector]
-            print(f'len measured = {len(distances_date_tuple_list)}')
-            for i in range(n_points):
-                rowCSV = [f'{traj[i][0]}',f'{traj[i][1]}']
-                print(f'n{i}')
-                point_and_measurement_i = list(np.array(distances_date_tuple_list[0][i][1]))
-                rowCSV= rowCSV + point_and_measurement_i
-                listCSV.append(rowCSV)
-            newCSV.writerows(listCSV)
-            traj
-            csvfile.close()
+    #         newCSV = csv.writer(csvfile)
+    #         params = traj_angle_dict['params']
+    #         traj = traj_angle_dict['traj']
+    #         n_points = len(distances_date_tuple_list[0])
+    #         print(f'n_point = {n_points}')
+    #         listCSV = [distance_vector]
+    #         print(f'len measured = {len(distances_date_tuple_list)}')
+    #         for i in range(n_points):
+    #             rowCSV = [f'{traj[i][0]}',f'{traj[i][1]}']
+    #             print(f'n{i}')
+    #             point_and_measurement_i = list(np.array(distances_date_tuple_list[0][i][1]))
+    #             rowCSV= rowCSV + point_and_measurement_i
+    #             listCSV.append(rowCSV)
+    #         newCSV.writerows(listCSV)
+    #         traj
+    #         csvfile.close() # file = open(path, 'rb')
+
+    # traj_angle_dict = 0
+    # distances_date_tuple_list = []
+    # file_len_counter = 0
+    # while True:
+    #     try:
+    #         if file_len_counter == 0:
+    #             traj_angle_dict = pkl.load(file)
+    #         else:
+    #             distances_date_tuple_list.append(pkl.load(file))
+    #         file_len_counter += 1
+    #     except:
+    #         break
+    # file.close()
+
+    # if save:
+    #     pathCSV = path[:-4]+'.csv'
+
+    #     with open(pathCSV, 'w') as csvfile:#, newline=''
+        
+    #         newCSV = csv.writer(csvfile)
+    #         params = traj_angle_dict['params']
+    #         traj = traj_angle_dict['traj']
+    #         n_points = len(distances_date_tuple_list[0])
+    #         print(f'n_point = {n_points}')
+    #         listCSV = [distance_vector]
+    #         print(f'len measured = {len(distances_date_tuple_list)}')
+    #         for i in range(n_points):
+    #             rowCSV = [f'{traj[i][0]}',f'{traj[i][1]}']
+    #             print(f'n{i}')
+    #             point_and_measurement_i = list(np.array(distances_date_tuple_list[0][i][1]))
+    #             rowCSV= rowCSV + point_and_measurement_i
+    #             listCSV.append(rowCSV)
+    #         newCSV.writerows(listCSV)
+    #         traj
+    #         csvfile.close()
