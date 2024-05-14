@@ -8,7 +8,7 @@ from src.test_scripts import distanceFinder
 
 
 #////curve_analizer ==========================================================================
-def curve_analizer(curve):
+def curve_analizer(curve, thr):
     std = round(np.std(curve),2)
     mean = round(np.mean(curve),2)
     max_index = np.argmax(curve)
