@@ -12,7 +12,7 @@ def curve_analizer(curve):
     std = round(np.std(curve),2)
     mean = round(np.mean(curve),2)
     max_index = np.argmax(curve)
-    distance = distanceFinder.distanceFinder(curve, 15, o, 30)
+    distance = distanceFinder.distanceFinder(curve, 15, 0, 30)
     return distance, mean, std
 
 #////END: curve_analizer =====================================================================
