@@ -8,16 +8,16 @@ from src.test_scripts import distanceFinder
 
 
 #////curve_analizer ==========================================================================
-def curve_analizer(curve, thr):
+def curve_analizer(curve, thr, mindist, maxdist):
     std = round(np.std(curve),2)
     mean = round(np.mean(curve),2)
     max_index = np.argmax(curve)
-    distance = distanceFinder.distanceFinder(curve, thr, 0, 30)
+    distance = distanceFinder.distanceFinder(curve, thr, MINDISTANCE, MAXDISTANCE)
     return distance, mean, std
 
 #////END: curve_analizer =====================================================================
 
-def animate(i, xs, ys, thr):
+def animate(i, xs, thr):
     """
     This function is called periodically from FuncAnimation
     """
@@ -62,12 +62,11 @@ if __name__ == '__main__':
 
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
-    ys = []
     
     serial_radar.open_serial(args.arduino_usb_port)
     print(serial_radar.is_serial_open())
     # Set up plot to call animate() function periodically
-    ani = animation.FuncAnimation(fig, animate, fargs=(xs, ys, THRESHOLD), interval=(800))
+    ani = animation.FuncAnimation(fig, animate, fargs=(xs, THRESHOLD), interval=(800))
     plt.show()
 
     serial_radar.close_serial()

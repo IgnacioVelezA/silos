@@ -27,7 +27,7 @@ def plot_measure(theta_list, phi_list, distance_measurements, minAxis, maxAxis, 
     X = np.zeros(len(distance_measurements))
     Y = np.zeros(len(distance_measurements))
     Z = np.zeros(len(distance_measurements))
-    index = np.zeros(len(distance_measurements))
+    index = list(np.zeros(len(distance_measurements)))
 
     distance_centered = distance_measurements#*np.cos(angulo_zero)
 
@@ -36,9 +36,9 @@ def plot_measure(theta_list, phi_list, distance_measurements, minAxis, maxAxis, 
         # para implementación final debe ser positivo
         # theta = elevation; phi = azimutal
         X[i] = np.sin(theta_list_rad[i]) * np.sin(phi_list_rad[i]) * (distance_centered[i]+0.01)
-        Y[i] = -1*np.sin(theta_list_rad[i]) * np.cos(phi_list_rad[i]) * (distance_centered[i]+0.01)
+        Y[i] = np.sin(theta_list_rad[i]) * np.cos(phi_list_rad[i]) * (distance_centered[i]+0.01)
         Z[i] = -distance_centered[i]*np.cos(theta_list_rad[i])
-        index[i] = i
+        index[i] = f'punto {i}; elev: {theta_list[i]}; azi: {phi_list[i]}; rawdist = {distance_measurements[i]}'
         if distance_measurements[i] > 30:
            Z[i] = -35
 
@@ -114,9 +114,9 @@ def plot_measure(theta_list, phi_list, distance_measurements, minAxis, maxAxis, 
 
 
 #////plot_curve====================================================================================
-def plot_curve(i, xs, thr ,title = ''):
+def plot_curve(i, xs, thr, jump ,title = ''):
     curve = curves[i]
-    distance = distanceFinder.distanceFinder(curve, thr ,MINDISTANCE,MAXDISTANCE)
+    distance = distanceFinder.distanceFinder(curve, thr ,MINDISTANCE,MAXDISTANCE, jump)
     z = np.cos(theta_angles[i]*np.pi/180)*distance
 
 
@@ -360,6 +360,7 @@ if __name__=='__main__':
 
     # saving target angles
     n_iterations = file_len_counter-1
+    print(distances_date_tuple_list)
     n_points = len(distances_date_tuple_list[0]) #<------------cambiar para determinar n de puntos
 
     phi_angles = np.zeros(n_points)
@@ -379,7 +380,7 @@ if __name__=='__main__':
         angle_rep = 0 #<-- debe poder leerse desde la data
         for j in range(n_points):
             curves_jpoint = np.array(distances_date_tuple_list[0][j][1]) #
-            distances[0][j] = distanceFinder.distanceSplines(curves_jpoint, threshold,MINDISTANCE,MAXDISTANCE, i)
+            distances[0][j] = distanceFinder.distanceSplines(curves_jpoint, threshold,MINDISTANCE,MAXDISTANCE, 3, 1)
             curves.append(curves_jpoint)
 
             # distances[i] corresponds to the measured distances for the i-th iteration

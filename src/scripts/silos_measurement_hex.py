@@ -75,45 +75,48 @@ if __name__ == '__main__':
     except TypeError:
         angle_rep = 1
 
-    # try:
-    #     number_of_trajectories = int(args.number_of_trajectories)
-    # except TypeError:
-    #     number_of_trajectories = 1
-    
-
     # Defining wait time for radar
     radar_measure_wait_time = args.radar_wait_time
 
     traj = hex_trajectory.hex_trajectory(RADIO_BEAM, RADIO_SURFACE)
-    # for point in og_traj:
-    #     angle_rep_index = 0
-    #     while True:
-    #         traj.append(point)
-    #         if angle_rep_index == angle_rep:
-    #             break
-    #         angle_rep_index += 1
 
 
     time.sleep(1)
     todays_date = date.today()      
 
-    name = 'measurements/'
-    if args.filename[-4:] == '.pkl':
-        name = name + args.filename[:-4]+ '_'+ str(todays_date) + '.pkl'
-    else:
-        name = name + args.filename+ '_' + str(todays_date) + '.pkl'
+    # file name ----------------------------------------------------------
+    nameSD = 'measurements/'
+    nameUSB = '/media/silos/15FC-A7CE/measurements/'
     
+    if args.filename[-4:] == '.pkl':
+        suffix = args.filename[:-4]+ '_'+ str(todays_date) + '.pkl'
+        nameSD = nameSD + suffix
+        nameUSB = nameUSB + suffix
+    else:
+        suffix = args.filename+ '_' + str(todays_date) + '.pkl'
+        nameSD = nameSD + suffix
+        nameUSB = nameUSB + suffix
+    
+    # opening files ------------------------------------------------------
     try :
-        # if file exist, just append data to it
-        file = open(name,'rb')
-        file.close()
+        # if files exist, just append data to it
+        fileSD = open(nameSD,'rb')
+        fileSD.close()
+        fileUSB = open(nameUSB, 'rb')
+        fileUSB.close()
+
     except FileNotFoundError:
         #if file does not exist initialize it
-        file = open(name,'wb')
         config_dict = {'params': (RADIO_BEAM, RADIO_SURFACE),
                        'traj' : traj}
-        pkl.dump(config_dict,file)
-        file.close()
+
+        fileSD = open(name,'wb')
+        pkl.dump(config_dict,fileSD)
+        fileSD.close()
+
+        fileUSB = open(name, 'wb')
+        pkl.dump(config_dict,fileUSB)
+        fileUSB.close()
 
     # Initializing radar serial comm
     serial_radar.open_serial(args.radar_usb_port)
@@ -132,7 +135,7 @@ if __name__ == '__main__':
 
     az_motor = stepper_motor.stepper_motor(id = 1,speed=0, max_speed=400, acceleration=200)
     az_motor.add_limit_switch(12,-90) #12
-    az_motor.add_limit_switch(25,90) #24
+    az_motor.add_limit_switch(22,90) #24
     time.sleep(1)
 
     el_motor = stepper_motor.stepper_motor(id = 2, speed=0, max_speed=400, acceleration=200)
@@ -157,26 +160,18 @@ if __name__ == '__main__':
     data_counter = 0
     
     # Pointing and measuring the corresponding angles
-    # while True:
     
     ltraj = len(traj)
-    file = open(name,'ab')
+
+    fileSD = open(nameSD,'ab')
+    fileUSB = open(nameUSB,'ab')
+
     measured_curves = [] 
     i = 0
     while True:
         try:
-            #same_point_counter = 0
-            #same_point_curves = []
             print(f'//////--Point {i} out of {ltraj}--//////')
-            #while True:
             curve_repetition_n = point_and_measure(traj[i],radar_measure_wait_time)
-            #same_point_curves.append(curve_repetition_n)
-            #print(f'///--Repetition {same_point_counter} out of {angle_rep}--///')
-
-            #if same_point_counter == angle_rep:
-            #       break
-            #   same_point_counter += 1
-            #print(f'number of meas per point = {len(same_point_curves)}')
             measured_curves.append(curve_repetition_n) 
             if i == ltraj-1:
                 break
@@ -185,8 +180,10 @@ if __name__ == '__main__':
         except:
             break
 
-    pkl.dump(measured_curves,file)
-    file.close()
+    pkl.dump(measured_curves, fileSD)
+    fileSD.close()
+    pkl.dump(measured_curves, fileUSB)
+    fileUSB.close()
 
     # Done, returning motors to 0 position
     #-------------------------------------------------------------
