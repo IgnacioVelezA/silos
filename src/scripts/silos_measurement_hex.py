@@ -124,7 +124,7 @@ if __name__ == '__main__':
     else:
         print("Could not open arduino radar port, FATAL ERROR")
 
-    az_motor = stepper_motor.stepper_motor(id = 1,speed=0, max_speed=400, acceleration=200)
+    az_motor = stepper_motor.stepper_motor(id = 1,speed=0, max_speed=400, acceleration=400)
     az_motor.add_limit_switch(12,-90) #12
     az_motor.add_limit_switch(22,90) #24
     time.sleep(1)
@@ -136,7 +136,7 @@ if __name__ == '__main__':
 
     # Initializing motors position using limit switches
 
-    az_motor.initialization(dir=1,speed=0, max_speed=400, acceleration=200)
+    az_motor.initialization(dir=1,speed=0, max_speed=400, acceleration=400)
     while not az_motor.is_initialized:
         time.sleep(MOTOR_STATUS_POLLING_TIME)
     az_motor.move(0)
