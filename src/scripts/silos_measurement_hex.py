@@ -92,6 +92,7 @@ if __name__ == '__main__':
         nameSD = nameSD + suffix
     else:
         suffix = args.filename+ '_' + str(todays_date) + '.pkl'
+        nameSD = nameSD + suffix
     
     # opening files ------------------------------------------------------
     try :
