@@ -110,11 +110,11 @@ if __name__ == '__main__':
         config_dict = {'params': (RADIO_BEAM, RADIO_SURFACE),
                        'traj' : traj}
 
-        fileSD = open(name,'wb')
+        fileSD = open(nameSD,'wb')
         pkl.dump(config_dict,fileSD)
         fileSD.close()
 
-        fileUSB = open(name, 'wb')
+        fileUSB = open(nameUSB, 'wb')
         pkl.dump(config_dict,fileUSB)
         fileUSB.close()
 
