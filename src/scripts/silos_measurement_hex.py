@@ -86,24 +86,18 @@ if __name__ == '__main__':
 
     # file name ----------------------------------------------------------
     nameSD = 'measurements/'
-    nameUSB = '/media/silos/15FC-A7CE/measurements/'
     
     if args.filename[-4:] == '.pkl':
         suffix = args.filename[:-4]+ '_'+ str(todays_date) + '.pkl'
         nameSD = nameSD + suffix
-        nameUSB = nameUSB + suffix
     else:
         suffix = args.filename+ '_' + str(todays_date) + '.pkl'
-        nameSD = nameSD + suffix
-        nameUSB = nameUSB + suffix
     
     # opening files ------------------------------------------------------
     try :
         # if files exist, just append data to it
         fileSD = open(nameSD,'rb')
         fileSD.close()
-        fileUSB = open(nameUSB, 'rb')
-        fileUSB.close()
 
     except FileNotFoundError:
         #if file does not exist initialize it
@@ -113,10 +107,6 @@ if __name__ == '__main__':
         fileSD = open(nameSD,'wb')
         pkl.dump(config_dict,fileSD)
         fileSD.close()
-
-        fileUSB = open(nameUSB, 'wb')
-        pkl.dump(config_dict,fileUSB)
-        fileUSB.close()
 
     # Initializing radar serial comm
     serial_radar.open_serial(args.radar_usb_port)
@@ -164,7 +154,6 @@ if __name__ == '__main__':
     ltraj = len(traj)
 
     fileSD = open(nameSD,'ab')
-    fileUSB = open(nameUSB,'ab')
 
     measured_curves = [] 
     i = 0
@@ -182,8 +171,6 @@ if __name__ == '__main__':
 
     pkl.dump(measured_curves, fileSD)
     fileSD.close()
-    pkl.dump(measured_curves, fileUSB)
-    fileUSB.close()
 
     # Done, returning motors to 0 position
     #-------------------------------------------------------------
