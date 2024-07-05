@@ -265,7 +265,7 @@ if __name__ == '__main__':
 
     el_motor = stepper_motor(id = 2, speed=0, max_speed=400, acceleration=600)
     el_motor.add_limit_switch(18,-44)
-    el_motor.add_limit_switch(23,44)
+    el_motor.add_limit_switch(23,53)
 
     # except Exception as e:
     #     print("Error:", e)
