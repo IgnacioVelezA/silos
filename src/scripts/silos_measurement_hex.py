@@ -86,16 +86,16 @@ if __name__ == '__main__':
 
     # file name ----------------------------------------------------------
     nameSD = 'measurements/'
-    nameUSB = '/media/silos/15FC-A7CE/measurements/'
+    #nameUSB = '/media/silos/15FC-A7CE/measurements/'
     
     if args.filename[-4:] == '.pkl':
         suffix = args.filename[:-4]+ '_'+ str(todays_date) + '.pkl'
         nameSD = nameSD + suffix
-        nameUSB = nameUSB + suffix
+        #nameUSB = nameUSB + suffix
     else:
         suffix = args.filename+ '_' + str(todays_date) + '.pkl'
         nameSD = nameSD + suffix
-        nameUSB = nameUSB + suffix
+        #nameUSB = nameUSB + suffix
     
     # opening files ------------------------------------------------------
     try :
@@ -114,9 +114,9 @@ if __name__ == '__main__':
         pkl.dump(config_dict,fileSD)
         fileSD.close()
 
-        fileUSB = open(nameUSB, 'wb')
-        pkl.dump(config_dict,fileUSB)
-        fileUSB.close()
+        # fileUSB = open(nameUSB, 'wb')
+        # pkl.dump(config_dict,fileUSB)
+        # fileUSB.close()
 
     # Initializing radar serial comm
     serial_radar.open_serial(args.radar_usb_port)
@@ -133,24 +133,24 @@ if __name__ == '__main__':
     else:
         print("Could not open arduino radar port, FATAL ERROR")
 
-    az_motor = stepper_motor.stepper_motor(id = 1,speed=0, max_speed=400, acceleration=200)
+    az_motor = stepper_motor.stepper_motor(id = 1,speed=0, max_speed=400, acceleration=600)
     az_motor.add_limit_switch(12,-90) #12
     az_motor.add_limit_switch(22,90) #24
     time.sleep(1)
 
-    el_motor = stepper_motor.stepper_motor(id = 2, speed=0, max_speed=400, acceleration=200)
+    el_motor = stepper_motor.stepper_motor(id = 2, speed=0, max_speed=400, acceleration=600)
     el_motor.add_limit_switch(18,-44) #18
-    el_motor.add_limit_switch(23,44) #23
+    el_motor.add_limit_switch(23,53) #23
     time.sleep(1)
 
     # Initializing motors position using limit switches
 
-    az_motor.initialization(dir=1,speed=0, max_speed=400, acceleration=200)
+    az_motor.initialization(dir=1,speed=0, max_speed=400, acceleration=600)
     while not az_motor.is_initialized:
         time.sleep(MOTOR_STATUS_POLLING_TIME)
     az_motor.move(0)
 
-    el_motor.initialization(dir=1,speed=0, max_speed=400, acceleration=200) 
+    el_motor.initialization(dir=1,speed=0, max_speed=400, acceleration=600) 
     while not el_motor.is_initialized:
         time.sleep(MOTOR_STATUS_POLLING_TIME)
     el_motor.move(0)
@@ -164,7 +164,7 @@ if __name__ == '__main__':
     ltraj = len(traj)
 
     fileSD = open(nameSD,'ab')
-    fileUSB = open(nameUSB,'ab')
+    #fileUSB = open(nameUSB,'ab')
 
     measured_curves = [] 
     i = 0
@@ -182,8 +182,8 @@ if __name__ == '__main__':
 
     pkl.dump(measured_curves, fileSD)
     fileSD.close()
-    pkl.dump(measured_curves, fileUSB)
-    fileUSB.close()
+    # pkl.dump(measured_curves, fileUSB)
+    # fileUSB.close()
 
     # Done, returning motors to 0 position
     #-------------------------------------------------------------
