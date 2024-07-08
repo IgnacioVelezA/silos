@@ -102,8 +102,8 @@ if __name__ == '__main__':
         # if files exist, just append data to it
         fileSD = open(nameSD,'rb')
         fileSD.close()
-        fileUSB = open(nameUSB, 'rb')
-        fileUSB.close()
+        # fileUSB = open(nameUSB, 'rb')
+        # fileUSB.close()
 
     except FileNotFoundError:
         #if file does not exist initialize it
