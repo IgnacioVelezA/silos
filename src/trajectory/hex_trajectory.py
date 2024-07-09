@@ -68,4 +68,3 @@ def hex_trajectory(dist_cent, rmax):
         trajectory.append((az, el))
 
     return trajectory   #, puntos
-
