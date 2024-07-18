@@ -40,7 +40,7 @@ print("raw_angle_start = ",raw_angle_start);
 of = open("angles.csv","w");
 
 while True:
-    time.sleep(0.1)
+    time.sleep(1)
     raw_angle = ReadRawAngle()
     magnitude = ReadMagnitude()
 
