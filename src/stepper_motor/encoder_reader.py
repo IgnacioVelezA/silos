@@ -26,10 +26,6 @@ def ReadRawAngle(): # Read angle (0-360 represented as 0-4096)
   read_bytes = bus.read_i2c_block_data(DEVICE_AS5600, 0x0C, 2)
   return (read_bytes[0]<<8) | read_bytes[1];
 
-def ReadMagnitude(): # Read magnetism magnitude
-  read_bytes = bus.read_i2c_block_data(DEVICE_AS5600, 0x1B, 2)
-  return (read_bytes[0]<<8) | read_bytes[1];
-
 #===============================================================
 
 
@@ -42,18 +38,15 @@ of = open("angles.csv","w");
 while True:
     time.sleep(1)
     raw_angle = ReadRawAngle()
-    magnitude = ReadMagnitude()
 
     SensorAngle = (raw_angle+4096-raw_angle_start) & 4095;
     SensorAngleDeg = (SensorAngle * 360.0)/4096;
     MotorAngleDeg = StepCount * 360.0 / (200*8) # 8x microstepping
 
-    mag = magnitude/4096.0
     diff = SensorAngleDeg-MotorAngleDeg
     if diff >= 360: diff -= 360
     if diff <= -360: diff += 360
-    print ("%6.2f,%6.2f, %5.3f  d=%5.3f"%(MotorAngleDeg, SensorAngleDeg, mag, diff))
-    print ("%6.2f,%6.2f, %5.3f"%(MotorAngleDeg, SensorAngleDeg, mag), file=of)
+    print ("%6.2f,%6.2f  d=%5.3f"%(MotorAngleDeg, SensorAngleDeg, diff))
 
 
 
