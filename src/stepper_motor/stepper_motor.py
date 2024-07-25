@@ -229,8 +229,7 @@ class stepper_motor:
         read_bytes = bus.read_i2c_block_data(ENCODER_ADRESS, 0x0C, 2)
         raw_angle = (read_bytes[0]<<8) | read_bytes[1];
         
-        SensorAngle = (raw_angle+4096-raw_angle_start) & 4095;
-        SensorAngleDeg = (SensorAngle * 360.0)/4096;
+        SensorAngleDeg = (raw_angle * 360.0)/4096;
 
         if use_offset == True:
             current_angle_encoder = SensorAngleDeg+self.angle_offset
