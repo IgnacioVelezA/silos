@@ -1,9 +1,9 @@
 import src.stepper_motor.serial_arduino as serial_arduino
 import RPi.GPIO as GPIO
-#import gpiozero #<<<<<<<<<<<<<<<<<<<<-
 import time
 from datetime import datetime, timedelta
 import argparse
+import smbus
 
 ANGLE_ERROR = 1    # 1 degrees
 
@@ -16,18 +16,22 @@ STANDARD_SPEED = 2
 STANDARD_MAX_SPEED = 4
 STANDARD_ACCELERATION = 6
 
+
+ENCODER_ADRESS = 0x36 
+
 class stepper_motor:
     def __init__(self, id, speed=STANDARD_SPEED, max_speed=STANDARD_MAX_SPEED, acceleration=STANDARD_ACCELERATION):
         self.id = id
         self.is_initialized = False
         self.limit_switch_list = []
         self.limit_switch_angle_list = []
-        self.limit_switch_objects= []
         self.angle_offset = 0
+        self.current_angle = 0
         self.ignore_stop = False
         self.speed = speed
         self.max_speed = max_speed
         self.acceleration = acceleration
+
 
     def initialization(self, dir=1, max_speed = 2, speed=1, acceleration=10):
         """
@@ -47,8 +51,6 @@ class stepper_motor:
         LS_reached = False
         # Waits until the button is pressed
         while not LS_reached:
-            # for button in self.limit_switch_objects:
-                #LS_pin = button.pin.number
             for LS_pin in self.limit_switch_list:
                 #---------------------------------------------------
                 if GPIO.event_detected(LS_pin):
@@ -73,7 +75,6 @@ class stepper_motor:
         time.sleep(0.1)
 
         # Calculates and sets the offset, and sets is_initialized = True
-        # LS_angle = self.LS_angle #Read at limit_switch.yaml
         self.angle_offset = LS_angle-angle_read
         print("Offset used: "+ str(angle_read*(-1)))
         self.is_initialized = True
@@ -88,6 +89,7 @@ class stepper_motor:
         time.sleep(0.1)
         self.set_motor_acceleration(self.acceleration)
         time.sleep(0.1)
+
 
     def move(self, angle, use_offset = True, override_initialization = False):
         if self.is_initialized or override_initialization:
@@ -109,6 +111,7 @@ class stepper_motor:
         else:
             print ("Can't do. You have to initialize the motor first")
 
+
     def stop(self,channel = 0):
         """
         Stops the motor. If this function is called by an interrupt, it checks if the limit switch
@@ -117,18 +120,11 @@ class stepper_motor:
         ignore_stop is True and the motor doesn't stop.
         """
         if channel != 0:
-            #if not self.ignore_stop:
-            #    time.sleep(0.1)
-            #    if not GPIO.input(channel):
-            #        print("Stopping motor, device " + str(self.id))
-            #        print("Stopped from channel " + str(channel))
-            #        serial_arduino.send_cmd(self.id,"stop","",SERIAL_WAIT_TIME)
-            #else:
-            #    print("Limit switch ignored")
             print("Limit switch ignored")
         else:
             print("Stopping motor")
             serial_arduino.send_cmd(self.id,"stop","",SERIAL_WAIT_TIME)
+
 
     def check_correct_limit_switch_stop(self, channel,dir):
         """
@@ -148,6 +144,7 @@ class stepper_motor:
             return False
         else:
             return True
+
 
     def wait_for_target_angle(self, target_angle, use_offset = True):
         """
@@ -170,6 +167,7 @@ class stepper_motor:
                 at_final_position = True
 
         return at_final_position
+
 
     def return_from_wrong_LS(self,dir):
         print("Returning from wrong LS")
@@ -198,12 +196,12 @@ class stepper_motor:
         """
         self.limit_switch_list.append(raspi_pin)
         self.limit_switch_angle_list.append(angle)  # Set pull_up to True to enable the internal pull-up resistor
-        #button.when_pressed = self.stop  # Attach the stop method to the button's when_pressed event
         #--------------------------------------------------------------
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(raspi_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
         GPIO.add_event_detect(raspi_pin, GPIO.BOTH, callback=self.stop, bouncetime=100)
         # -----------------------------------------------------------------
+
 
     def read_angle(self, use_offset = True):
         angle_response = serial_arduino.send_cmd(self.id,"rdangle","",SERIAL_WAIT_TIME)
@@ -223,17 +221,41 @@ class stepper_motor:
             final_angle = angle
         return final_angle
 
+
+    def read_encoder(self, use_offset = True):
+        bus_id = self.id -1 # motor 2 -> i2c bus 1, motor 1 -> i2c 0
+        bus = smbus.SMBus(bus_id)
+
+        read_bytes = bus.read_i2c_block_data(ENCODER_ADRESS, 0x0C, 2)
+        raw_angle = (read_bytes[0]<<8) | read_bytes[1];
+        
+        SensorAngle = (raw_angle+4096-raw_angle_start) & 4095;
+        SensorAngleDeg = (SensorAngle * 360.0)/4096;
+
+        if use_offset == True:
+            current_angle_encoder = SensorAngleDeg+self.angle_offset
+
+        else:
+            current_angle_encoder = SensorAngleDeg
+        
+        self.current_angle = current_angle_encoder
+        return current_angle_encoder
+
     def set_id(self, id):
         self.id = id
+
 
     def set_motor_speed(self,speed):
         serial_arduino.send_cmd(self.id,"setspd",speed,SERIAL_WAIT_TIME)
 
+
     def set_motor_max_speed(self,max_speed):
         serial_arduino.send_cmd(self.id,"setmaxspd",max_speed,SERIAL_WAIT_TIME)
 
+
     def set_motor_acceleration(self,acceleration):
         serial_arduino.send_cmd(self.id,"setacc",acceleration,SERIAL_WAIT_TIME)
+
 
     def reset(self):
         print("Resetting device " + str(self.id))
@@ -241,6 +263,7 @@ class stepper_motor:
         self.limit_switch_angle_list = []
         self.angle_offset = 0
         self.is_initialized = False
+
 
 if __name__ == '__main__':
     # Initializing radar motors, setting PID and limit switches
@@ -267,14 +290,5 @@ if __name__ == '__main__':
     el_motor.add_limit_switch(18,-44)
     el_motor.add_limit_switch(23,53)#23
 
-    # except Exception as e:
-    #     print("Error:", e)
 
     time.sleep(1)
-# finally:
-    #     # Close the Button objects to release the GPIO pins
-    #     for button in el_motor.limit_switch_objects:
-    #         button.close()
-
-    #     for button in az_motor.limit_switch_objects:
-    #         button.close()
