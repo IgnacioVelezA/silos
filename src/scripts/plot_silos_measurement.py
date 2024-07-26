@@ -291,6 +291,7 @@ if __name__=='__main__':
 
     # reading file and saving distances
     traj_angle_dict = 0
+    real_trajectory = []
     distances_date_tuple_list = []
     file_len_counter = 0
     while True:
@@ -298,6 +299,7 @@ if __name__=='__main__':
             if file_len_counter == 0:
                 traj_angle_dict = pkl.load(file)
             else:
+                real_trajectory.append(pkl.load(file))
                 distances_date_tuple_list.append(pkl.load(file))
             file_len_counter += 1
         except:

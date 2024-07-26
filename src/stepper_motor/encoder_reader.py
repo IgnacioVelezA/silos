@@ -41,12 +41,11 @@ while True:
 
     SensorAngle = (raw_angle+4096-raw_angle_start) & 4095;
     SensorAngleDeg = (SensorAngle * 360.0)/4096;
-    MotorAngleDeg = StepCount * 360.0 / (200*8) # 8x microstepping
 
     diff = SensorAngleDeg-MotorAngleDeg
     if diff >= 360: diff -= 360
     if diff <= -360: diff += 360
-    print ("%6.2f,%6.2f  d=%5.3f"%(MotorAngleDeg, SensorAngleDeg, diff))
+    print ("%6.2f,%6.2f  d=%5.3f"%(raw_angle, SensorAngleDeg, diff))
 
 
 

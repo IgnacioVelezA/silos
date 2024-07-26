@@ -18,6 +18,7 @@ WAIT_TIME_AFTER_MEASUREMENT = 0.1   # in seconds
 LOWEST_EL_ANGLE = 30    # Angle between zenith and lowest el point to measure
 
 measured_distances = []
+real_trajectory = []
 
 def point_and_measure(angles, measure_wait_time):
     az_motor.move(angles[0])
@@ -28,6 +29,9 @@ def point_and_measure(angles, measure_wait_time):
     el_motor.wait_for_target_angle(angles[1])
     measure_time = datetime.utcnow()
 
+    az_motor.set_current_angle()
+    el_motor.set_current_angle()
+
     # Waits for the radar curve to refresh
     print("Arrived to position, waiting " + str(measure_wait_time) + "s for radar curve to refresh")
     time.sleep(measure_wait_time)
@@ -37,7 +41,7 @@ def point_and_measure(angles, measure_wait_time):
     print("Measured distance at AZ = " + str(angles[0])
         +" and EL = " + str(angles[1]))
     
-    return (measure_time, curve)    #distance, curve)
+    return measure_time, curve     #distance, curve)
 
 
 if __name__ == '__main__':
@@ -174,13 +178,18 @@ if __name__ == '__main__':
             print(f'//////--Point {i} out of {ltraj}--//////')
             curve_repetition_n = point_and_measure(traj[i],radar_measure_wait_time)
             measured_curves.append(curve_repetition_n) 
+
+            az_real_position = az_motor.set_current_angle()
+            el_real_position = el_motor.set_current_angle()
+
+            real_trajectory.append((az_real_position, el_real_position))
             if i == ltraj-1:
                 break
             
             i += 1
         except:
             break
-
+    pkl.dump(real_trajectory, fileSD)
     pkl.dump(measured_curves, fileSD)
     fileSD.close()
     # pkl.dump(measured_curves, fileUSB)
@@ -193,5 +202,4 @@ if __name__ == '__main__':
     #-------------------------------------------------------------
 
     # Printing results
-    print("Measures:")
-    print(measured_curves)
+    print("finished measurement")

@@ -222,7 +222,7 @@ class stepper_motor:
         return final_angle
 
 
-    def read_encoder(self, use_offset = True):
+    def read_encoder(self):
         bus_id = self.id -1 # motor 2 -> i2c bus 1, motor 1 -> i2c 0
         bus = smbus.SMBus(bus_id)
 
@@ -231,15 +231,19 @@ class stepper_motor:
         
         SensorAngleDeg = (raw_angle * 360.0)/4096;
 
-        if use_offset == True:
-            current_angle_encoder = SensorAngleDeg+self.angle_offset
+        return SensorAngleDeg
 
+
+    def set_current_angle(self, use_offset = True):
+        if use_offset:
+            current_angle_encoder = self.read_encoder() - self.angle_offset 
         else:
-            current_angle_encoder = SensorAngleDeg
+            current_angle_encoder = self.read_encoder()
         
         self.current_angle = current_angle_encoder
         return current_angle_encoder
 
+        
     def set_id(self, id):
         self.id = id
 
