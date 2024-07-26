@@ -20,6 +20,7 @@ LOWEST_EL_ANGLE = 30    # Angle between zenith and lowest el point to measure
 measured_distances = []
 real_trajectory = []
 
+
 def point_and_measure(angles, measure_wait_time):
     az_motor.move(angles[0])
     el_motor.move(angles[1])
@@ -152,11 +153,13 @@ if __name__ == '__main__':
     az_motor.initialization(dir=1,speed=0, max_speed=400, acceleration=600)
     while not az_motor.is_initialized:
         time.sleep(MOTOR_STATUS_POLLING_TIME)
+    az_motor.offset_angle_encoder = az_motor.read_encoder() #por ahora queda en 0 en la posición del ls reached
     az_motor.move(0)
 
     el_motor.initialization(dir=1,speed=0, max_speed=400, acceleration=600) 
     while not el_motor.is_initialized:
         time.sleep(MOTOR_STATUS_POLLING_TIME)
+    el_motor.offset_angle_encoder = el_motor.read_encoder() #por ahora queda en 0 en la posición del ls reached
     el_motor.move(0)
     
     print("Both motors are initialized")
@@ -177,11 +180,10 @@ if __name__ == '__main__':
         try:
             print(f'//////--Point {i} out of {ltraj}--//////')
             curve_repetition_n = point_and_measure(traj[i],radar_measure_wait_time)
+
             measured_curves.append(curve_repetition_n) 
-
-            az_real_position = az_motor.set_current_angle()
-            el_real_position = el_motor.set_current_angle()
-
+            az_real_position = az_motor.read_encoder()- az_motor.offset_angle_encoder
+            el_real_position = el_motor.read_encoder() - el_motor.offset_angle_encoder 
             real_trajectory.append((az_real_position, el_real_position))
             if i == ltraj-1:
                 break

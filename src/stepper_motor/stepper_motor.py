@@ -26,6 +26,7 @@ class stepper_motor:
         self.limit_switch_list = []
         self.limit_switch_angle_list = []
         self.angle_offset = 0
+        self.offset_angle_encoder = 0
         self.current_angle = 0
         self.ignore_stop = False
         self.speed = speed
@@ -232,16 +233,6 @@ class stepper_motor:
         SensorAngleDeg = (raw_angle * 360.0)/3200;
 
         return SensorAngleDeg
-
-
-    def set_current_angle(self, use_offset = True):
-        if use_offset:
-            current_angle_encoder = self.read_encoder() - self.angle_offset 
-        else:
-            current_angle_encoder = self.read_encoder()
-        
-        self.current_angle = current_angle_encoder
-        return current_angle_encoder
 
 
     def set_id(self, id):
