@@ -30,9 +30,6 @@ def point_and_measure(angles, measure_wait_time):
     el_motor.wait_for_target_angle(angles[1])
     measure_time = datetime.utcnow()
 
-    az_motor.set_current_angle()
-    el_motor.set_current_angle()
-
     # Waits for the radar curve to refresh
     print("Arrived to position, waiting " + str(measure_wait_time) + "s for radar curve to refresh")
     time.sleep(measure_wait_time)
@@ -188,7 +185,10 @@ if __name__ == '__main__':
             measured_curves.append(curve_repetition_n) 
             az_real_position = az_motor.read_encoder()- az_motor.offset_angle_encoder
             el_real_position = el_motor.read_encoder() - el_motor.offset_angle_encoder 
-            real_trajectory.append((az_real_position, el_real_position))
+            real_position = (az_real_position, el_real_position)
+            print(real_position)
+            real_trajectory.append(real_position)
+
             if i == ltraj-1:
                 break
             
