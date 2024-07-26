@@ -153,12 +153,15 @@ if __name__ == '__main__':
     az_motor.initialization(dir=1,speed=0, max_speed=400, acceleration=600)
     while not az_motor.is_initialized:
         time.sleep(MOTOR_STATUS_POLLING_TIME)
+    az_motor.offset_angle_encoder = az_motor.read_encoder()
+    time.sleep(0.1)
     az_motor.move(0)
 
     el_motor.initialization(dir=1,speed=0, max_speed=400, acceleration=600) 
     while not el_motor.is_initialized:
         time.sleep(MOTOR_STATUS_POLLING_TIME)
-    #el_motor.offset_angle_encoder = el_motor.read_encoder() #por ahora queda en 0 en la posición del ls reached
+    el_motor.offset_angle_encoder = el_motor.read_encoder() #por ahora queda en 0 en la posición del ls reached
+    time.sleep(0.1)
     el_motor.move(0)
     
     
