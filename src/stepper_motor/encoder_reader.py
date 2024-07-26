@@ -39,8 +39,8 @@ while True:
     time.sleep(1)
     raw_angle = ReadRawAngle()
 
-    SensorAngle = (raw_angle+4096-raw_angle_start) & 4095;
-    SensorAngleDeg = (SensorAngle * 360.0)/4096;
+    SensorAngle = (raw_angle+3200-raw_angle_start) & 3200;
+    SensorAngleDeg = (SensorAngle * 360.0)/3200;
 
     diff = SensorAngleDeg-MotorAngleDeg
     if diff >= 360: diff -= 360
