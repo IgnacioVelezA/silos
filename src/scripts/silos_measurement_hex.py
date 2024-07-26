@@ -193,7 +193,9 @@ if __name__ == '__main__':
                 break
             
             i += 1
-        except:
+        except Exception as error:
+            # handle the exception
+            print("An exception occurred:", error)
             break
     pkl.dump(real_trajectory, fileSD)
     pkl.dump(measured_curves, fileSD)
