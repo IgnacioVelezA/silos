@@ -351,7 +351,9 @@ if __name__=='__main__':
         try:
             if file_len_counter == 0:
                 traj_angle_dict = pkl.load(file)
+                print(traj_angle_dict)
             else:
+                real_traj = pkl.load(file)
                 distances_date_tuple_list.append(pkl.load(file))
             file_len_counter += 1
         except:

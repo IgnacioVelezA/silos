@@ -298,9 +298,15 @@ if __name__=='__main__':
         try:
             if file_len_counter == 0:
                 traj_angle_dict = pkl.load(file)
+                #print(traj_angle_dict)
             else:
                 real_trajectory.append(pkl.load(file))
                 distances_date_tuple_list.append(pkl.load(file))
+                print('--------------')
+                print(real_trajectory)
+                print('--------------')
+                print(distances_date_tuple_list)
+
             file_len_counter += 1
         except:
             break
@@ -315,6 +321,7 @@ if __name__=='__main__':
     theta_angles = np.zeros(n_points)
 
     for i in range(n_points):
+        print(i)
         phi_angles[i] = traj_angle_dict["traj"][i][0]
         theta_angles[i] = traj_angle_dict["traj"][i][1]
 
