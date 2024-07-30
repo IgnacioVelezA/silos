@@ -17,7 +17,7 @@ def curve_analizer(curve, thr, mindist, maxdist):
 
 #////END: curve_analizer =====================================================================
 
-def animate(i, xs, thr):
+def animate(i, xs, thr, mindist, maxdist):
     """
     This function is called periodically from FuncAnimation
     """
@@ -28,7 +28,7 @@ def animate(i, xs, thr):
 
     ys = np.array(curve)
     max_power = max(ys)
-    distance, mean, std = curve_analizer(ys, thr)
+    distance, mean, std = curve_analizer(ys, thr, mindist, maxdist)
 
     # Draw x and y lists
     ax.clear()
@@ -66,7 +66,7 @@ if __name__ == '__main__':
     serial_radar.open_serial(args.arduino_usb_port)
     print(serial_radar.is_serial_open())
     # Set up plot to call animate() function periodically
-    ani = animation.FuncAnimation(fig, animate, fargs=(xs, THRESHOLD), interval=(800))
+    ani = animation.FuncAnimation(fig, animate, fargs=(xs, THRESHOLD, MINDISTANCE, MAXDISTANCE), interval=(800))
     plt.show()
 
     serial_radar.close_serial()

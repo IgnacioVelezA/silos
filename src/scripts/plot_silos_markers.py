@@ -382,7 +382,7 @@ if __name__=='__main__':
         angle_rep = 0 #<-- debe poder leerse desde la data
         for j in range(n_points):
             curves_jpoint = np.array(distances_date_tuple_list[0][j][1]) #
-            distances[0][j] = distanceFinder.distanceSplines(curves_jpoint, threshold,MINDISTANCE,MAXDISTANCE, 3, 1)
+            distances[0][j] = distanceFinder.distanceSplines(curves_jpoint, threshold,MINDISTANCE,MAXDISTANCE, 0, 1)
             curves.append(curves_jpoint)
 
             # distances[i] corresponds to the measured distances for the i-th iteration
