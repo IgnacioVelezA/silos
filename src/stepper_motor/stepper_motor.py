@@ -76,8 +76,8 @@ class stepper_motor:
         time.sleep(0.1)
 
         # Calculates and sets the offset, and sets is_initialized = True
+        print("Finished initializing device " + str(self.id))
         self.angle_offset = LS_angle-angle_read
-        print('Encoder position for LS = '+str(self.LS_angle_meassure))
         self.is_initialized = True
 
         #setting normal speeds
@@ -91,7 +91,7 @@ class stepper_motor:
         time.sleep(0.1)
         self.LS_angle_meassured = self.read_encoder()
         time.sleep(0.1)
-        print("Finished initializing device " + str(self.id))
+        print('Encoder position for LS = '+str(self.LS_angle_meassure))
 
 
     def move(self, angle, use_offset = True, override_initialization = False):
