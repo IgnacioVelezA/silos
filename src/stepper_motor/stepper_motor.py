@@ -27,7 +27,7 @@ class stepper_motor:
         self.limit_switch_angle_list = []
         self.angle_offset = 0
         self.LS_pos_encoder = 0
-        self.LS_angle_meassured = 107
+        self.LS_angle_meassured = 0
         self.ignore_stop = False
         self.speed = speed
         self.max_speed = max_speed
@@ -91,7 +91,7 @@ class stepper_motor:
         time.sleep(0.1)
         self.LS_angle_meassured = self.read_encoder()
         time.sleep(0.1)
-        print('Encoder position for LS = '+str(self.LS_angle_meassure))
+        print('Encoder position for LS = '+str(self.LS_angle_meassured))
 
 
     def move(self, angle, use_offset = True, override_initialization = False):
