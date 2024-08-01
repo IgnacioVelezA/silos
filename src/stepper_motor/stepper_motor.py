@@ -231,6 +231,8 @@ class stepper_motor:
         raw_angle = (read_bytes[0]<<8) | read_bytes[1];
         
         SensorAngleDeg = (raw_angle * 360.0)/3200;
+        if self.id == 1
+            return raw_angle 
 
         return SensorAngleDeg
 
