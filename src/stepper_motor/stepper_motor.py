@@ -241,7 +241,7 @@ class stepper_motor:
         LS_angle_deg = self.limit_switch_angle_list[1] #position in degrees of LS
         LS_position_encoder = self.LS_angle_meassured
         
-        actual_position = magnet_angle - LS_angle_deg-LS_position_encoder
+        actual_position = 360-magnet_angle + LS_angle_deg+LS_position_encoder
         return actual_position
 
     def set_id(self, id):
