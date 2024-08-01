@@ -26,8 +26,8 @@ class stepper_motor:
         self.limit_switch_list = []
         self.limit_switch_angle_list = []
         self.angle_offset = 0
-        self.offset_angle_encoder = 0
-        self.current_angle = 0
+        self.LS_pos_encoder = 0
+        self.LS_angle_meassured = 107
         self.ignore_stop = False
         self.speed = speed
         self.max_speed = max_speed
@@ -76,8 +76,9 @@ class stepper_motor:
         time.sleep(0.1)
 
         # Calculates and sets the offset, and sets is_initialized = True
+        self.LS_angle_meassured = self.read_encoder()
         self.angle_offset = LS_angle-angle_read
-        print("Offset used: "+ str(angle_read*(-1)))
+        print('Encoder position for LS = '+str(self.LS_angle_meassure))
         self.is_initialized = True
         print("Finished initializing device " + str(self.id))
 
@@ -230,12 +231,17 @@ class stepper_motor:
         read_bytes = bus.read_i2c_block_data(ENCODER_ADRESS, 0x0C, 2)
         raw_angle = (read_bytes[0]<<8) | read_bytes[1];
         
-        SensorAngleDeg = (raw_angle * 360.0)/3200;
-        if self.id == 1:
-            return raw_angle 
+        SensorAngleDeg = raw_angle * 90.0/1024;
 
         return SensorAngleDeg
 
+    def get_encoder_angle(self):
+        magnet_angle = self.read_encoder #angle from the 0 of the magnets system of reference
+        LS_angle_deg = self.limit_switch_angle_list[0] #position in degrees of LS
+        LS_position_encoder = self.LS_angle_meassured
+        
+        actual_position = magnet_angle - LS_angle_deg-LS_position_encoder
+        return actual_position
 
     def set_id(self, id):
         self.id = id
@@ -279,12 +285,12 @@ if __name__ == '__main__':
     GPIO.cleanup()
     az_motor = stepper_motor(id = 1,speed=0, max_speed=400, acceleration=600)
     az_motor.add_limit_switch(12,-90)
-    az_motor.add_limit_switch(22,90)#¬24¬22
+    az_motor.add_limit_switch(22,107)#¬24¬22
     time.sleep(1)
 
     el_motor = stepper_motor(id = 2, speed=0, max_speed=400, acceleration=600)
     el_motor.add_limit_switch(18,-44)
-    el_motor.add_limit_switch(23,53)#23
+    el_motor.add_limit_switch(23,58)#23
 
 
     time.sleep(1)
