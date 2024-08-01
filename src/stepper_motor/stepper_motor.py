@@ -237,8 +237,8 @@ class stepper_motor:
         return SensorAngleDeg
 
     def get_encoder_angle(self):
-        magnet_angle = self.read_encoder #angle from the 0 of the magnets system of reference
-        LS_angle_deg = self.limit_switch_angle_list[0] #position in degrees of LS
+        magnet_angle = self.read_encoder() #angle from the 0 of the magnets system of reference
+        LS_angle_deg = self.limit_switch_angle_list[1] #position in degrees of LS
         LS_position_encoder = self.LS_angle_meassured
         
         actual_position = magnet_angle - LS_angle_deg-LS_position_encoder
