@@ -256,7 +256,7 @@ class stepper_motor:
         elif angle < -180:
             angle += 360
         
-        return 90-angle
+        return angle
 
 
     def set_id(self, id):
