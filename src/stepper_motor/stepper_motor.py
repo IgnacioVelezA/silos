@@ -232,31 +232,31 @@ class stepper_motor:
         read_bytes = bus.read_i2c_block_data(ENCODER_ADRESS, 0x0C, 2)
         raw_angle = (read_bytes[0]<<8) | read_bytes[1];
         
-        SensorAngleDeg = raw_angle * 90.0/1024;
+        SensorAngleDeg = raw_angle #* 90.0/1024;
 
         return SensorAngleDeg
 
-    def get_encoder_angle(self):
+    # def get_encoder_angle(self):
 
-        # Convertir bits a grados
-        measure_degrees = self.read_encoder() #angle fmeasured by the encoders internal axis
-        LS_degrees = self.LS_angle_meassured
-        LS_pos_degrees = 90- self.limit_switch_angle_list[1] #for example, the LS angle is 107 but i need it to be -17 to work
+    #     # Convertir bits a grados
+    #     measure_degrees = self.read_encoder() #angle fmeasured by the encoders internal axis
+    #     LS_degrees = self.LS_angle_meassured
+    #     LS_pos_degrees = 90- self.limit_switch_angle_list[1] #for example, the LS angle is 107 but i need it to be -17 to work
 
-        # Calcular la posición medida desde el LS
-        measure_from_LS = measure_degrees - LS_degrees
+    #     # Calcular la posición medida desde el LS
+    #     measure_from_LS = measure_degrees - LS_degrees
         
-        # Ajustar con la posición del LS
-        position_corrected = measure_from_LS + LS_pos_degrees
+    #     # Ajustar con la posición del LS
+    #     position_corrected = measure_from_LS + LS_pos_degrees
         
-        # Normalizar el ángulo en el rango -180 a 180
-        angle = position_corrected % 360
-        if angle > 180:
-            angle -= 360
-        elif angle < -180:
-            angle += 360
+    #     # Normalizar el ángulo en el rango -180 a 180
+    #     angle = position_corrected % 360
+    #     if angle > 180:
+    #         angle -= 360
+    #     elif angle < -180:
+    #         angle += 360
         
-        return angle
+    #     return angle
 
 
     def set_id(self, id):
