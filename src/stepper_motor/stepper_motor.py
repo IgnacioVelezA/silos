@@ -241,7 +241,7 @@ class stepper_motor:
         # Convertir bits a grados
         measure_degrees = self.read_encoder() #angle fmeasured by the encoders internal axis
         LS_degrees = self.LS_angle_meassured
-        LS_angle_deg = 90- self.limit_switch_angle_list[1] #for example, the LS angle is 107 but i need it to be -17 to work
+        LS_pos_degrees = 90- self.limit_switch_angle_list[1] #for example, the LS angle is 107 but i need it to be -17 to work
 
         # Calcular la posición medida desde el LS
         measure_from_LS = measure_degrees - LS_degrees
