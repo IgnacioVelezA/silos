@@ -306,7 +306,7 @@ if __name__ == '__main__':
 
     el_motor = stepper_motor(id = 2, speed=0, max_speed=400, acceleration=600)
     el_motor.add_limit_switch(18,-44)
-    el_motor.add_limit_switch(23,58)#23
+    el_motor.add_limit_switch(23,35)#23
 
 
     time.sleep(1)
