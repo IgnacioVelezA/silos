@@ -226,7 +226,7 @@ class stepper_motor:
 
 
     def read_encoder(self):
-        bus_id = 1#self.id -1 # motor 2 -> i2c bus 1, motor 1 -> i2c 0
+        bus_id = self.id -1 # motor 2 -> i2c bus 1, motor 1 -> i2c 0
         bus = smbus.SMBus(bus_id)
 
         read_bytes = bus.read_i2c_block_data(ENCODER_ADRESS, 0x0C, 2)
