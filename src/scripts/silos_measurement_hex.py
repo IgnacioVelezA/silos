@@ -140,12 +140,12 @@ if __name__ == '__main__':
 
     az_motor = stepper_motor.stepper_motor(id = 1,speed=0, max_speed=400, acceleration=600)
     az_motor.add_limit_switch(12,-90) #12
-    az_motor.add_limit_switch(22,90) #24
+    az_motor.add_limit_switch(22,92) #24
     time.sleep(1)
 
     el_motor = stepper_motor.stepper_motor(id = 2, speed=0, max_speed=400, acceleration=600)
     el_motor.add_limit_switch(18,-44) #18
-    el_motor.add_limit_switch(23,53) #23
+    el_motor.add_limit_switch(23,39) #23
     time.sleep(1)
 
     # Initializing motors position using limit switches
@@ -153,14 +153,14 @@ if __name__ == '__main__':
     az_motor.initialization(dir=1,speed=0, max_speed=400, acceleration=600)
     while not az_motor.is_initialized:
         time.sleep(MOTOR_STATUS_POLLING_TIME)
-    az_motor.offset_angle_encoder = az_motor.read_encoder()
+    az_motor.LS_angle_meassured = az_motor.read_encoder()
     time.sleep(0.1)
     az_motor.move(0)
 
     el_motor.initialization(dir=1,speed=0, max_speed=400, acceleration=600) 
     while not el_motor.is_initialized:
         time.sleep(MOTOR_STATUS_POLLING_TIME)
-    el_motor.offset_angle_encoder = el_motor.read_encoder() #por ahora queda en 0 en la posición del ls reached
+    el_motor.LS_angle_meassured = el_motor.read_encoder() #por ahora queda en 0 en la posición del ls reached
     time.sleep(0.1)
     el_motor.move(0)
     
