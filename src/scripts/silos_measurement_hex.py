@@ -182,8 +182,21 @@ if __name__ == '__main__':
             curve_repetition_n = point_and_measure(traj[i],radar_measure_wait_time)
 
             measured_curves.append(curve_repetition_n) 
-            az_real_position = (az_motor.read_encoder()- az_motor.LS_angle_meassured)*90/1024
+
+            intento = 0
+
+            try:
+                az_real_position = (az_motor.read_encoder()- az_motor.LS_angle_meassured)*90/1024
+            except:
+                if intento < 10:
+                    intento += 1
+                else:
+                    az_real_position = traj[i][0]
+                    "An error ocurred while reading encoder, using nominal position"
+                    continue
+
             el_real_position = (el_motor.read_encoder() - el_motor.LS_angle_meassured)*90/1024 
+                    
             real_position = (az_real_position, el_real_position)
             print(real_position)
             real_trajectory.append(real_position)
