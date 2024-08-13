@@ -309,6 +309,104 @@ def interpolateBetween(XYZcoords, minAxis, maxAxisvisualization = "3d",
 
 #////END: interpolateBetween ===========================================================================
 
+def correct_real_traj(traj_measured):
+    offset_cero_azimutal = traj_measured[0][0]
+    offset_cero_elev = traj_measured[0][1] 
+    real_traj_corr = [(offset_cero_azimutal-punto[0], offset_cero_elev-punto[1]) for punto in real_traj]
+    return real_traj_corr
+
+#////plot_with_encoder ===============================================================================
+def plot_with_encoder(traj_measured, distance_measurements, minAxis, maxAxis, titlei = False):
+    real_traj_corr = correct_real_traj(traj_measured)
+    theta_list_rad = [value[0] * np.pi/180 for value in real_traj_corr]
+    phi_list_rad = [value[1] * np.pi/180 for value in real_traj_corr]
+
+    X = np.zeros(len(distance_measurements))
+    Y = np.zeros(len(distance_measurements))
+    Z = np.zeros(len(distance_measurements))
+    index = list(np.zeros(len(distance_measurements)))
+
+    distance_centered = distance_measurements#*np.cos(angulo_zero)
+
+    for i in range(len(distance_measurements)):
+        # X e Y están multiplicados por -1 mientras se hacen pruebas horizontales,
+        # para implementación final debe ser positivo
+        # theta = elevation; phi = azimutal
+        X[i] = np.sin(theta_list_rad[i]) * np.sin(phi_list_rad[i]) * (distance_centered[i]+0.01)
+        Y[i] = np.sin(theta_list_rad[i]) * np.cos(phi_list_rad[i]) * (distance_centered[i]+0.01)
+        Z[i] = -distance_centered[i]*np.cos(theta_list_rad[i])
+        index[i] = f'punto {i}; elev: {real_traj_corr[i][1]}; azi: {real_traj_corr[i][0]}; rawdist = {distance_measurements[i]}'
+        if distance_measurements[i] > 30:
+           Z[i] = -35
+
+    # Configures the figure based on the chosen visualization
+    fig = go.Figure()
+
+    scatter = fig.add_trace(go.Scatter3d(
+        x=X,
+        y=Y,
+        z=Z,
+        mode='markers',
+            marker=dict(
+            size=3,
+            color=Z,  # Usar la coordenada z como color
+            colorscale='Viridis',  # Colormap
+            colorbar=dict(title='Eje Z')
+        ),
+        text = index
+        ))
+
+    fig.update_layout(scene=dict(
+        xaxis=dict(title='Eje X'),
+        yaxis=dict(title='Eje Y'),
+        zaxis=dict(title='Eje Z', range = [-maxAxis,minAxis]),
+        ),title = "Using encoders")
+        
+#fig.colorbar(scatter, shrink=0.5, aspect=5, label = "Distance [m]")
+
+    fig.show()
+
+    while True:
+        mark = input('Indice (just enter to break):')
+        if mark:
+            #if mark == x:
+            indxMark = int(mark)
+            fig = go.Figure()
+            scatter = fig.add_trace(go.Scatter3d(
+                x=X,
+                y=Y,
+                z=Z,
+                mode='markers',
+                    marker=dict(
+                    size=3,
+                    color=Z,  # Usar la coordenada z como color
+                    colorscale='Viridis',  # Colormap
+                    colorbar=dict(title='Eje Z')
+                ),
+                text = index
+                ))
+            scatter = fig.add_trace(go.Scatter3d(
+                x=[X[indxMark]],
+                y=[Y[indxMark]],
+                z=[Z[indxMark]],
+                mode='markers',
+                    marker=dict(
+                    size=3,
+                    color='red'
+                ),
+                text = mark
+                ))
+
+                # fig.update_layout(scene=dict(
+                #     xaxis=dict(title='Eje X'),
+                #     yaxis=dict(title='Eje Y'),
+                #     zaxis=dict(title='Eje Z', range = [minAxis, maxAxis]),
+                #     ),title = titlei)
+
+            fig.show()
+        else:
+            break
+    return [X, Y, Z]
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser(description='plots a silos measurement'+
@@ -317,7 +415,6 @@ if __name__=='__main__':
     parser.add_argument('-min', '--MINDISTANCE', default = 0, type = int)
     parser.add_argument('-max', '--MAXDISTANCE', default = 30, type = int)
     parser.add_argument('-thr', '--threshold', default = 15, type = int)
-
     args = parser.parse_args()
 
     if args.filename[-4:] == '.pkl':
@@ -390,6 +487,7 @@ if __name__=='__main__':
 
         [X, Y, Z] = plot_measure(theta_angles, phi_angles, distances[0], MINDISTANCE,MAXDISTANCE, titlei = titles[i])
         
+        [X, Y, Z] = plot_with_encoder(real_traj, distances[0], MINDISTANCE,MAXDISTANCE, titlei = titles[i])
         XYZsplines[titles[i]] = [X,Y,Z]
 
     # curves[i][j] corresponds to the curve of the j-th point of the i-th iteration

@@ -186,7 +186,7 @@ if __name__ == '__main__':
             intento = 0
 
             try:
-                az_real_position = (az_motor.read_encoder()- az_motor.LS_angle_meassured)*90/1024
+                az_real_position = az_motor.read_encoder()
             except:
                 if intento < 10:
                     intento += 1
@@ -195,7 +195,7 @@ if __name__ == '__main__':
                     "An error ocurred while reading encoder, using nominal position"
                     continue
 
-            el_real_position = (el_motor.read_encoder() - el_motor.LS_angle_meassured)*90/1024 
+            el_real_position = el_motor.read_encoder()
                     
             real_position = (az_real_position, el_real_position)
             print(real_position)
