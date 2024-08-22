@@ -222,4 +222,5 @@ if __name__ == '__main__':
     #-------------------------------------------------------------
 
     # Printing results
+    print(measured_curves)
     print("finished measurement")

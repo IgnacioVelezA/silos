@@ -243,83 +243,89 @@ def plotCut(XYZcoords, spline, xcut = False, ycut = False, step_angle = 3):
 
 
 #////interpolateBetween ===========================================================================
-def interpolateBetween(XYZcoords, minAxis, maxAxisvisualization = "3d", 
-                                  iteration = 0, poly_order = 3, n_mesh=50):
+# def interpolateBetween(XYZcoords, minAxis, maxAxisvisualization = "3d", 
+#                                   iteration = 0, poly_order = 3, n_mesh=50):
 
-    X = XYZcoords[0]
-    Y = XYZcoords[1]
-    Z = XYZcoords[2]
-    # Fit a 3rd order, 2d polynomial
-    m = polyfit2d(X,Y,Z, order = poly_order)
+#     X = XYZcoords[0]
+#     Y = XYZcoords[1]
+#     Z = XYZcoords[2]
+#     # Fit a 3rd order, 2d polynomial
+#     m = polyfit2d(X,Y,Z, order = poly_order)
 
-    # Evaluate it on a grid...
-    nx, ny = n_mesh, n_mesh
-    xx, yy = np.meshgrid(np.linspace(X.min(), X.max(), nx), 
-                         np.linspace(Y.min(), Y.max(), ny))
-    positions = np.vstack([xx.ravel(), yy.ravel()])
+#     # Evaluate it on a grid...
+#     nx, ny = n_mesh, n_mesh
+#     xx, yy = np.meshgrid(np.linspace(X.min(), X.max(), nx), 
+#                          np.linspace(Y.min(), Y.max(), ny))
+#     positions = np.vstack([xx.ravel(), yy.ravel()])
 
-    mesh_points_list = []
+#     mesh_points_list = []
 
-    for i in range(len(positions[0])):
-        mesh_points_list.append(Point(positions[0][i],positions[1][i]))
+#     for i in range(len(positions[0])):
+#         mesh_points_list.append(Point(positions[0][i],positions[1][i]))
 
-    # Calculates the valid zone for points
-    geos = GeoSeries(map(Point, zip(X, Y)))
-    valid_2d_zone = geos.unary_union.convex_hull
-    valid_points_list = []
+#     # Calculates the valid zone for points
+#     geos = GeoSeries(map(Point, zip(X, Y)))
+#     valid_2d_zone = geos.unary_union.convex_hull
+#     valid_points_list = []
 
-    # Calculating valid meshgrid points
-    for i in range(len(mesh_points_list)):
-        if valid_2d_zone.intersects(mesh_points_list[i]):
-            valid_points_list.append(mesh_points_list[i])
+#     # Calculating valid meshgrid points
+#     for i in range(len(mesh_points_list)):
+#         if valid_2d_zone.intersects(mesh_points_list[i]):
+#             valid_points_list.append(mesh_points_list[i])
 
-    # Constructing new interpolated array
-    valid_interX_array = []
-    valid_interY_array = []
+#     # Constructing new interpolated array
+#     valid_interX_array = []
+#     valid_interY_array = []
 
-    for i in range(len(valid_points_list)):
-        valid_interX_array.append(valid_points_list[i].x)
-        valid_interY_array.append(valid_points_list[i].y)
+#     for i in range(len(valid_points_list)):
+#         valid_interX_array.append(valid_points_list[i].x)
+#         valid_interY_array.append(valid_points_list[i].y)
 
-    # Calculating Z value for valid grid points
-    zz = polyval2d(xx, yy, m)
+#     # Calculating Z value for valid grid points
+#     zz = polyval2d(xx, yy, m)
     
-    valid_interZ_array = []
-    for i in range(len(valid_interX_array)):
-        x_index = np.where(xx==valid_interX_array[i])[1][0]
-        y_index = np.where(yy==valid_interY_array[i])[0][1]
-        valid_interZ_array.append(zz[y_index][x_index])
+#     valid_interZ_array = []
+#     for i in range(len(valid_interX_array)):
+#         x_index = np.where(xx==valid_interX_array[i])[1][0]
+#         y_index = np.where(yy==valid_interY_array[i])[0][1]
+#         valid_interZ_array.append(zz[y_index][x_index])
 
-    # Configures the figure based on the chosen visualization
-    fig = plt.figure()
+#     # Configures the figure based on the chosen visualization
+#     fig = plt.figure()
 
-    ax = fig.add_subplot(1,1,1, projection='3d')
-    ax.set(zlim=(minAxis, maxAxis))
-    vmin = min(np.min(valid_interZ_array), np.min(Z))
-    vmax = max(np.max(valid_interZ_array), np.max(Z))
-    plot = ax.scatter(valid_interX_array, valid_interY_array, valid_interZ_array, c = valid_interZ_array,
-                        cmap = "gist_rainbow", vmin=vmin, vmax=vmax, alpha=0.5)
-    plot = ax.scatter(X,Y,Z, c = Z, cmap="gist_rainbow",marker="x", vmin=vmin, vmax=vmax)
+#     ax = fig.add_subplot(1,1,1, projection='3d')
+#     ax.set(zlim=(minAxis, maxAxis))
+#     vmin = min(np.min(valid_interZ_array), np.min(Z))
+#     vmax = max(np.max(valid_interZ_array), np.max(Z))
+#     plot = ax.scatter(valid_interX_array, valid_interY_array, valid_interZ_array, c = valid_interZ_array,
+#                         cmap = "gist_rainbow", vmin=vmin, vmax=vmax, alpha=0.5)
+#     plot = ax.scatter(X,Y,Z, c = Z, cmap="gist_rainbow",marker="x", vmin=vmin, vmax=vmax)
     
 
-    fig.colorbar(plot, shrink=0.5, aspect=5, label = "Distance [m]")
+#     fig.colorbar(plot, shrink=0.5, aspect=5, label = "Distance [m]")
 
-    plt.show()
-    return [X, Y, Z]
+#     plt.show()
+#     return [X, Y, Z]
 
 #////END: interpolateBetween ===========================================================================
 
 def correct_real_traj(traj_measured):
     offset_cero_azimutal = traj_measured[0][0]
-    offset_cero_elev = traj_measured[0][1] 
-    real_traj_corr = [(offset_cero_azimutal-punto[0], offset_cero_elev-punto[1]) for punto in real_traj]
+    offset_cero_elev = traj_measured[0][1]
+    real_traj_corr = []
+
+    for punto_i in range(len(real_traj)):
+        azimutal_encoder = (offset_cero_azimutal - traj_measured[punto_i][0] ) * 90/1024
+        elevation_encoder = (offset_cero_elev - traj_measured[punto_i][1]) * 90/1024
+        real_traj_corr.append((azimutal_encoder, elevation_encoder))
     return real_traj_corr
 
 #////plot_with_encoder ===============================================================================
 def plot_with_encoder(traj_measured, distance_measurements, minAxis, maxAxis, titlei = False):
     real_traj_corr = correct_real_traj(traj_measured)
-    theta_list_rad = [value[0] * np.pi/180 for value in real_traj_corr]
-    phi_list_rad = [value[1] * np.pi/180 for value in real_traj_corr]
+    print(real_traj_corr)
+    theta_list_rad = [value[1] * np.pi/180 for value in real_traj_corr]
+    phi_list_rad = [value[0] * np.pi/180 for value in real_traj_corr]
 
     X = np.zeros(len(distance_measurements))
     Y = np.zeros(len(distance_measurements))
@@ -456,7 +462,7 @@ if __name__=='__main__':
         except:
             break
     file.close()
-
+    print(real_traj)
     # saving target angles
     n_iterations = file_len_counter-1
     print(distances_date_tuple_list)
@@ -486,8 +492,7 @@ if __name__=='__main__':
             # plots using the visualization set as argument
 
         [X, Y, Z] = plot_measure(theta_angles, phi_angles, distances[0], MINDISTANCE,MAXDISTANCE, titlei = titles[i])
-        
-        [X, Y, Z] = plot_with_encoder(real_traj, distances[0], MINDISTANCE,MAXDISTANCE, titlei = titles[i])
+        #[X, Y, Z] = plot_with_encoder(real_traj, distances[0], MINDISTANCE,MAXDISTANCE, titlei = titles[i])
         XYZsplines[titles[i]] = [X,Y,Z]
 
     # curves[i][j] corresponds to the curve of the j-th point of the i-th iteration
