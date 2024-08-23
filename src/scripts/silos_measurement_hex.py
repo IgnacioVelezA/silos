@@ -183,17 +183,7 @@ if __name__ == '__main__':
 
             measured_curves.append(curve_repetition_n) 
 
-            intento = 0
-
-            try:
-                az_real_position = az_motor.read_encoder()
-            except:
-                if intento < 10:
-                    intento += 1
-                else:
-                    az_real_position = traj[i][0]
-                    "An error ocurred while reading encoder, using nominal position"
-                    continue
+            az_real_position = az_motor.read_encoder()
 
             el_real_position = el_motor.read_encoder()
                     
