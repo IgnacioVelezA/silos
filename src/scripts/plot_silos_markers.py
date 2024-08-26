@@ -11,6 +11,7 @@ import os
 import plotly.graph_objects as go
 
 from scipy.signal import savgol_filter
+from scipy.spatial import Delaunay
 import scipy.interpolate
 # Polyfit from https://stackoverflow.com/questions/7997152/python-3d-polynomial-surface-fit-order-dependent
 
@@ -242,72 +243,6 @@ def plotCut(XYZcoords, spline, xcut = False, ycut = False, step_angle = 3):
 #////END: plotCut =================================================================================
 
 
-#////interpolateBetween ===========================================================================
-# def interpolateBetween(XYZcoords, minAxis, maxAxisvisualization = "3d", 
-#                                   iteration = 0, poly_order = 3, n_mesh=50):
-
-#     X = XYZcoords[0]
-#     Y = XYZcoords[1]
-#     Z = XYZcoords[2]
-#     # Fit a 3rd order, 2d polynomial
-#     m = polyfit2d(X,Y,Z, order = poly_order)
-
-#     # Evaluate it on a grid...
-#     nx, ny = n_mesh, n_mesh
-#     xx, yy = np.meshgrid(np.linspace(X.min(), X.max(), nx), 
-#                          np.linspace(Y.min(), Y.max(), ny))
-#     positions = np.vstack([xx.ravel(), yy.ravel()])
-
-#     mesh_points_list = []
-
-#     for i in range(len(positions[0])):
-#         mesh_points_list.append(Point(positions[0][i],positions[1][i]))
-
-#     # Calculates the valid zone for points
-#     geos = GeoSeries(map(Point, zip(X, Y)))
-#     valid_2d_zone = geos.unary_union.convex_hull
-#     valid_points_list = []
-
-#     # Calculating valid meshgrid points
-#     for i in range(len(mesh_points_list)):
-#         if valid_2d_zone.intersects(mesh_points_list[i]):
-#             valid_points_list.append(mesh_points_list[i])
-
-#     # Constructing new interpolated array
-#     valid_interX_array = []
-#     valid_interY_array = []
-
-#     for i in range(len(valid_points_list)):
-#         valid_interX_array.append(valid_points_list[i].x)
-#         valid_interY_array.append(valid_points_list[i].y)
-
-#     # Calculating Z value for valid grid points
-#     zz = polyval2d(xx, yy, m)
-    
-#     valid_interZ_array = []
-#     for i in range(len(valid_interX_array)):
-#         x_index = np.where(xx==valid_interX_array[i])[1][0]
-#         y_index = np.where(yy==valid_interY_array[i])[0][1]
-#         valid_interZ_array.append(zz[y_index][x_index])
-
-#     # Configures the figure based on the chosen visualization
-#     fig = plt.figure()
-
-#     ax = fig.add_subplot(1,1,1, projection='3d')
-#     ax.set(zlim=(minAxis, maxAxis))
-#     vmin = min(np.min(valid_interZ_array), np.min(Z))
-#     vmax = max(np.max(valid_interZ_array), np.max(Z))
-#     plot = ax.scatter(valid_interX_array, valid_interY_array, valid_interZ_array, c = valid_interZ_array,
-#                         cmap = "gist_rainbow", vmin=vmin, vmax=vmax, alpha=0.5)
-#     plot = ax.scatter(X,Y,Z, c = Z, cmap="gist_rainbow",marker="x", vmin=vmin, vmax=vmax)
-    
-
-#     fig.colorbar(plot, shrink=0.5, aspect=5, label = "Distance [m]")
-
-#     plt.show()
-#     return [X, Y, Z]
-
-#////END: interpolateBetween ===========================================================================
 
 def correct_real_traj(traj_measured):
     offset_cero_azimutal = traj_measured[0][0]
@@ -414,6 +349,19 @@ def plot_with_encoder(traj_measured, distance_measurements, minAxis, maxAxis, ti
             break
     return [X, Y, Z]
 
+# def volume_calculator(xyzpoints):
+#     X,Y,Z = XYZcoords
+#     xypoints = np.array([X,Y])
+#     tri.delaunay(xypoints)
+#     indices = tri.simplices
+#     volume = 0
+#     for triangle_i in indices:
+        
+# def prism_volume_calculator(vertices): #vertices contains x,y,z of the top vertices
+#     ver1,ver2,ver3 = vertices
+#     mean_altitude = (ver1[2]+ver2[2]+ver3[2])/3
+#     triangle_area = 
+
 if __name__=='__main__':
     parser = argparse.ArgumentParser(description='plots a silos measurement'+
                                                  ' from a pkl file')
@@ -485,14 +433,14 @@ if __name__=='__main__':
         angle_rep = 0 #<-- debe poder leerse desde la data
         for j in range(n_points):
             curves_jpoint = np.array(distances_date_tuple_list[0][j][1]) #
-            distances[0][j] = distanceFinder.distanceSplines(curves_jpoint, threshold,MINDISTANCE,MAXDISTANCE, 0, 1)
+            distances[0][j] = distanceFinder.distanceSplines(curves_jpoint, threshold,MINDISTANCE,MAXDISTANCE, 3, 1)
             curves.append(curves_jpoint)
 
             # distances[i] corresponds to the measured distances for the i-th iteration
             # plots using the visualization set as argument
 
-        [X, Y, Z] = plot_measure(theta_angles, phi_angles, distances[0], MINDISTANCE,MAXDISTANCE, titlei = titles[i])
+        XYZcoords = plot_measure(theta_angles, phi_angles, distances[0], MINDISTANCE,MAXDISTANCE, titlei = titles[i])
         #[X, Y, Z] = plot_with_encoder(real_traj, distances[0], MINDISTANCE,MAXDISTANCE, titlei = titles[i])
-        XYZsplines[titles[i]] = [X,Y,Z]
+        #XYZsplines[titles[i]] = [X,Y,Z]
 
     # curves[i][j] corresponds to the curve of the j-th point of the i-th iteration
