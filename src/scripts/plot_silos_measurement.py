@@ -20,14 +20,17 @@ angulo_zero = 0#30*np.pi/180
 def plot_measure(theta_list, phi_list, distance_measurements, save, name, date, minAxis, maxAxis,, visualization = "3d"):
     theta_list_rad = [value * np.pi/180 for value in theta_list]
     phi_list_rad = [value * np.pi/180 for value in phi_list]
+    num_of_points = len(distance_measurements)
 
-    X = np.zeros(len(distance_measurements))
-    Y = np.zeros(len(distance_measurements))
-    Z = np.zeros(len(distance_measurements))
+    X = np.zeros(num_of_points)
+    Y = np.zeros(num_of_points)
+    Z = np.zeros(num_of_points)
 
     distance_centered = distance_measurements*np.cos(angulo_zero)
 
-    for i in range(len(distance_measurements)):
+    vertices = np.zeros([num_of_points,3])
+
+    for i in range(num_of_points):
         # X e Y están multiplicados por -1 mientras se hacen pruebas horizontales, 
         # para implementación final debe ser positivo
         # theta = elevation; phi = azimutal
@@ -38,6 +41,7 @@ def plot_measure(theta_list, phi_list, distance_measurements, save, name, date, 
         if Z[i] == 35:
            Z[i] = 35
 
+        vertices[i] = np.array([X[i], Y[i], Z[i]])
         #print(f'(Az[{i}] = {round(phi_list[i])}, El[{i}] = {round(theta_list[i])}); (X[{i}] = {round(X[i], 3)}, Y[{i}] = {round(Y[i], 3)})')
     
     # Configures the figure based on the chosen visualization
@@ -73,7 +77,7 @@ def plot_measure(theta_list, phi_list, distance_measurements, save, name, date, 
 
     #plot = ax.plot_trisurf(X, Y, Z)
     plt.show()
-    return [X, Y, Z]
+    return vertices
 #////END: plot_measure=============================================================================
 
 

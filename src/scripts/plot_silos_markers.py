@@ -25,14 +25,18 @@ def plot_measure(theta_list, phi_list, distance_measurements, minAxis, maxAxis, 
     theta_list_rad = [value * np.pi/180 for value in theta_list]
     phi_list_rad = [value * np.pi/180 for value in phi_list]
 
-    X = np.zeros(len(distance_measurements))
-    Y = np.zeros(len(distance_measurements))
-    Z = np.zeros(len(distance_measurements))
-    index = list(np.zeros(len(distance_measurements)))
+    num_of_points = len(distance_measurements)
+
+    X = np.zeros(num_of_points)
+    Y = np.zeros(num_of_points)
+    Z = np.zeros(num_of_points)
+    index = list(np.zeros(num_of_points))
 
     distance_centered = distance_measurements#*np.cos(angulo_zero)
 
-    for i in range(len(distance_measurements)):
+    vertices = np.zeros([num_of_points,3])
+
+    for i in range(num_of_points):
         # X e Y están multiplicados por -1 mientras se hacen pruebas horizontales,
         # para implementación final debe ser positivo
         # theta = elevation; phi = azimutal
@@ -40,8 +44,11 @@ def plot_measure(theta_list, phi_list, distance_measurements, minAxis, maxAxis, 
         Y[i] = np.sin(theta_list_rad[i]) * np.cos(phi_list_rad[i]) * (distance_centered[i]+0.01)
         Z[i] = -distance_centered[i]*np.cos(theta_list_rad[i])
         index[i] = f'punto {i}; elev: {theta_list[i]}; azi: {phi_list[i]}; rawdist = {distance_measurements[i]}'
+
         if distance_measurements[i] > 30:
            Z[i] = -35
+
+        vertices[i] = np.array([X[i], Y[i], Z[i]])
 
     # Configures the figure based on the chosen visualization
     fig = go.Figure()
@@ -110,7 +117,7 @@ def plot_measure(theta_list, phi_list, distance_measurements, minAxis, maxAxis, 
             fig.show()
         else:
             break
-    return [X, Y, Z]
+    return vertices
 #////END: plot_measure=============================================================================
 
 
@@ -440,7 +447,7 @@ if __name__=='__main__':
             # plots using the visualization set as argument
 
         XYZcoords = plot_measure(theta_angles, phi_angles, distances[0], MINDISTANCE,MAXDISTANCE, titlei = titles[i])
-        #[X, Y, Z] = plot_with_encoder(real_traj, distances[0], MINDISTANCE,MAXDISTANCE, titlei = titles[i])
+        [X, Y, Z] = plot_with_encoder(real_traj, distances[0], MINDISTANCE,MAXDISTANCE, titlei = titles[i])
         #XYZsplines[titles[i]] = [X,Y,Z]
 
     # curves[i][j] corresponds to the curve of the j-th point of the i-th iteration
