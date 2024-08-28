@@ -204,7 +204,7 @@ if __name__ == '__main__':
                 except:
                     print('An error ocurred while reading encoders')
                     time.sleep(0.1)
-                    if attempt_i = max_attempts - 1:
+                    if attempt_i == max_attempts - 1:
                         print(f'Max attempts done, using nominal position for point {i} in az')
                         el_real_position = traj[i][1]
                         
