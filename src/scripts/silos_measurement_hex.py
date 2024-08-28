@@ -177,6 +177,8 @@ if __name__ == '__main__':
 
     measured_curves = [] 
     i = 0
+    max_attempts = 5
+
     while True:
         try:
             print(f'//////--Point {i} out of {ltraj}--//////')
@@ -184,10 +186,28 @@ if __name__ == '__main__':
 
             measured_curves.append(curve_repetition_n) 
 
-            az_real_position = az_motor.read_encoder()
+            for attempt_i in range(max_attempts):
+                try:
+                    az_real_position = az_motor.read_encoder()
+                    break
+                except:
+                    print('An error ocurred while reading encoders')
+                    time.sleep(0.1)
+                    if attempt_i = max_attempts - 1:
+                        print(f'Max attempts done, using nominal position for point {i} in az')
+                        az_real_position = traj[i][0]
 
-            el_real_position = el_motor.read_encoder()
-                    
+            for attempt_i in range(max_attempts):
+                try:
+                    el_real_position = el_motor.read_encoder()
+                    break
+                except:
+                    print('An error ocurred while reading encoders')
+                    time.sleep(0.1)
+                    if attempt_i = max_attempts - 1:
+                        print(f'Max attempts done, using nominal position for point {i} in az')
+                        el_real_position = traj[i][1]
+                        
             real_position = (az_real_position, el_real_position)
             print(real_position)
             real_trajectory.append(real_position)
