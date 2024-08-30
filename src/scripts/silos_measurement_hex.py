@@ -5,7 +5,7 @@ from src.stepper_motor import stepper_motor
 import RPi.GPIO as GPIO
 import time
 import math
-
+import numpy as np
 from datetime import datetime, timedelta, date
 import csv
 import argparse
