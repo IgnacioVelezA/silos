@@ -74,13 +74,13 @@ if __name__ == '__main__':
 
     time.sleep(1)
     todays_date = date.today()      
-
+    params = 'r0:'+str(RADIO_BEAM)+'_'+'rmax:'+str(RADIO_SURFACE)
     # file name
     nameSD = 'measurements/'
     if args.filename[-4:] == '.csv':
-        suffix = args.filename[:-4] + '_' + str(todays_date) + '.csv'
+        suffix = args.filename[:-4] + '_' + params + '_' + str(todays_date) + '.csv'
     else:
-        suffix = args.filename + '_' + str(todays_date) + '.csv'
+        suffix = args.filename + '_' + params + '_' + str(todays_date) + '.csv'
     
     nameSD = nameSD + suffix
     
@@ -146,7 +146,7 @@ if __name__ == '__main__':
             with open(nameSD, mode='a', newline='') as fileSD:
                 writer = csv.writer(fileSD)
                 writer.writerow([measure_time, traj[i][0], traj[i][1], curve])
-            
+            curve = np.array(curve)
             measured_curves.append((measure_time, traj[i], curve))
             
         except Exception as error:
