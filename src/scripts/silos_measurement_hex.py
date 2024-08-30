@@ -143,10 +143,10 @@ if __name__ == '__main__':
             print(f'//////--Point {i} out of {ltraj}--//////')
             measure_time, curve = point_and_measure(traj[i], radar_measure_wait_time)
 
+            curve = np.array(curve)
             with open(nameSD, mode='a', newline='') as fileSD:
                 writer = csv.writer(fileSD)
                 writer.writerow([measure_time, traj[i][0], traj[i][1], curve])
-            curve = np.array(curve)
             measured_curves.append((measure_time, traj[i], curve))
             
         except Exception as error:
