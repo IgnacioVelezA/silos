@@ -185,41 +185,43 @@ if __name__ == '__main__':
             curve_repetition_n = point_and_measure(traj[i],radar_measure_wait_time)
 
             measured_curves.append(curve_repetition_n) 
-
-            for attempt_i in range(max_attempts):
-                try:
-                    az_real_position = az_motor.read_encoder()
-                    break
-                except:
-                    print('An error ocurred while reading encoders')
-                    time.sleep(0.1)
-                    if attempt_i == max_attempts - 1:
-                        print(f'Max attempts done, using nominal position for point {i} in az')
-                        az_real_position = traj[i][0]
-
-            for attempt_i in range(max_attempts):
-                try:
-                    el_real_position = el_motor.read_encoder()
-                    break
-                except:
-                    print('An error ocurred while reading encoders')
-                    time.sleep(0.1)
-                    if attempt_i == max_attempts - 1:
-                        print(f'Max attempts done, using nominal position for point {i} in az')
-                        el_real_position = traj[i][1]
-                        
-            real_position = (az_real_position, el_real_position)
-            print(real_position)
-            real_trajectory.append(real_position)
-
-            if i == ltraj-1:
-                break
             
-            i += 1
         except Exception as error:
             # handle the exception
             print("An exception occurred:", error)
             break
+
+        for attempt_i in range(max_attempts):
+            try:
+                az_real_position = az_motor.read_encoder()
+                break
+            except:
+                print('An error ocurred while reading encoders')
+                time.sleep(0.1)
+                if attempt_i == max_attempts - 1:
+                    print(f'Max attempts done, using nominal position for point {i} in az')
+                    az_real_position = 5600#traj[i][0]
+
+        for attempt_i in range(max_attempts):
+            try:
+                el_real_position = el_motor.read_encoder()
+                break
+            except:
+                print('An error ocurred while reading encoders')
+                time.sleep(0.1)
+                if attempt_i == max_attempts - 1:
+                    print(f'Max attempts done, using nominal position for point {i} in az')
+                    el_real_position = 5601#traj[i][1]
+                        
+        real_position = (az_real_position, el_real_position)
+        print(real_position)
+        real_trajectory.append(real_position)
+
+        if i == ltraj-1:
+            break
+        
+        i += 1
+
     pkl.dump(real_trajectory, fileSD)
     pkl.dump(measured_curves, fileSD)
     fileSD.close()
