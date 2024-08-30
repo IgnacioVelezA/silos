@@ -1,4 +1,4 @@
-import pickle as pkl
+
 import subprocess
 import argparse
 import os
@@ -9,7 +9,7 @@ import numpy as np
 if __name__=='__main__':
     parser = argparse.ArgumentParser(description='recovers a pickle dump generated'+
                                                  ' by silos_measurement.py script')
-    parser.add_argument('pickle_name', help='name of the file')
+    parser.add_argument('file_name', help='name of the file')
     parser.add_argument('-i','--ip', help ='ip where the raspi is')
     parser.add_argument('-min', '--MINDISTANCE', default = 0, type = int)
     parser.add_argument('-max', '--MAXDISTANCE', default = 30, type = int)
@@ -26,11 +26,7 @@ if __name__=='__main__':
     MAXDISTANCE = args.MAXDISTANCE
     save = args.save 
 
-    distance_vector = np.linspace(MINDISTANCE,MAXDISTANCE,128)
-    distance_vector = [round(di, 3) for di in distance_vector]
-    distance_vector = ['Azimutal','Elevation'] + distance_vector
-
-    full_name = args.pickle_name
+    full_name = args.file_name
     date_measured = full_name[-10:]
 
     path = 'measurements/' + date_measured
@@ -40,9 +36,9 @@ if __name__=='__main__':
     except:
         print(f'{date_measured} file already exist')
     
-    path = path + '/' + args.pickle_name + '.pkl'
+    path = path + '/' + args.file_name + '.csv'
 
-    server='silos@'+ip+':silos/measurements/'+ full_name +'.pkl'
+    server='silos@'+ip+':silos/measurements/'+ full_name +'.csv'
     command = ['scp',  server, path]
     subprocess.run(command)
 
