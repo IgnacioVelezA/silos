@@ -172,7 +172,6 @@ if __name__ == '__main__':
     # Pointing and measuring the corresponding angles
     ltraj = len(traj)
 
-    fileSD = open(nameSD,'ab')
     #fileUSB = open(nameUSB,'ab')
 
     measured_curves = [] 
@@ -185,7 +184,7 @@ if __name__ == '__main__':
             curve_repetition_n = point_and_measure(traj[i],radar_measure_wait_time)
 
             measured_curves.append(curve_repetition_n) 
-            
+
         except Exception as error:
             # handle the exception
             print("An exception occurred:", error)
@@ -222,6 +221,7 @@ if __name__ == '__main__':
         
         i += 1
 
+    fileSD = open(nameSD,'ab')
     pkl.dump(real_trajectory, fileSD)
     pkl.dump(measured_curves, fileSD)
     fileSD.close()
