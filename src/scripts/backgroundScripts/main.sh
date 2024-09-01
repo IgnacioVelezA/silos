@@ -3,8 +3,8 @@
 # Run script_A
 python3 ./silos/src/scripts/background_scripts/temperature.py
 
-iteration=1
-title="medicion_prueba_"
+iteration=19
+title="medicion_prueba_basurero_"
 ard_usb="/dev/ttyACM0"
 r0=3
 rmax=30

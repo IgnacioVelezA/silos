@@ -87,7 +87,7 @@ if __name__ == '__main__':
     # Initialize CSV file with headers
     with open(nameSD, mode='w', newline='') as fileSD:
         writer = csv.writer(fileSD)
-        writer.writerow(['Measure Time', 'Azimuth', 'Elevation', 'Curve'])
+        writer.writerow(['Measure Time', 'Commanded trajectory', 'Real trajectory', 'Curve'])
 
     # Initializing radar serial comm
     serial_radar.open_serial(args.radar_usb_port)
@@ -144,9 +144,7 @@ if __name__ == '__main__':
             measure_time, curve = point_and_measure(traj[i], radar_measure_wait_time)
 
             curve = np.array(curve)
-            with open(nameSD, mode='a', newline='') as fileSD:
-                writer = csv.writer(fileSD)
-                writer.writerow([measure_time, traj[i][0], traj[i][1], curve])
+
             measured_curves.append((measure_time, traj[i], curve))
             
         except Exception as error:
@@ -177,18 +175,18 @@ if __name__ == '__main__':
                     el_real_position = traj[i][1]
                         
         real_position = (az_real_position, el_real_position)
+
+        with open(nameSD, mode='a', newline='') as fileSD:
+            writer = csv.writer(fileSD)
+            writer.writerow([measure_time, traj[i], real_position, curve])
         print(real_position)
-        real_trajectory.append(real_position)
+        # real_trajectory.append(real_position)
 
         if i == ltraj-1:
             break
         
         i += 1
 
-    # Save final trajectory
-    with open(nameSD, mode='a', newline='') as fileSD:
-        writer = csv.writer(fileSD)
-        writer.writerow(["Real Trajectory"] + real_trajectory)
 
     # Done, returning motors to 0 position
     az_motor.move(0)
