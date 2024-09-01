@@ -195,3 +195,5 @@ if __name__ == '__main__':
     # Printing results
     print(measured_curves)
     print("finished measurement")
+
+    open('src/scripts/backgroundScripts/script_A_finished.flag', 'w').close()

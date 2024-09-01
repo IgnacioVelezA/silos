@@ -10,7 +10,7 @@ r0=3
 rmax=30
 radar_usb="/dev/ttyUSB0"
 
-while :; do
+for ((i = 0 ; i < 10 ; i++)); do
     filename="$title$iteration"
     python3 ./silos/src/scripts/silos_measurement_hex.py $filename $ard_usb $r0 $rmax $radar_usb
     # Wait for script_A to finish and the flag file to appear
