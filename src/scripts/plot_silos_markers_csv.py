@@ -2,18 +2,14 @@ import pickle as pkl
 import numpy as np
 import argparse
 import matplotlib.pyplot as plt
-import itertools
-import csv, ipdb
-from shapely.geometry import Point
-from geopandas import GeoSeries
-from src.test_scripts import distanceFinder
 import os
 import plotly.graph_objects as go
+import scipy.interpolate
 from scipy.spatial import Delaunay
 
-from scipy.signal import savgol_filter
-from scipy.spatial import Delaunay
-import scipy.interpolate
+from shapely.geometry import point
+from src.scripts import distanceFinder, readcsv
+
 # Polyfit from https://stackoverflow.com/questions/7997152/python-3d-polynomial-surface-fit-order-dependent
 
 angulo_zero = 0#30*np.pi/180
@@ -422,14 +418,14 @@ def volumen(X,Y,Z):
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser(description='plots a silos measurement'+
-                                                 ' from a pkl file')
+                                                 ' from a csv file')
     parser.add_argument('filename', help='name of the file')
     parser.add_argument('-min', '--MINDISTANCE', default = 0, type = int)
     parser.add_argument('-max', '--MAXDISTANCE', default = 30, type = int)
     parser.add_argument('-thr', '--threshold', default = 15, type = int)
     args = parser.parse_args()
 
-    if args.filename[-4:] == '.pkl':
+    if args.filename[-4:] == '.csv':
         name = args.filename[:-14]
         date = args.filename[-14:-4]
         fileDir = 'measurements/' + date + '/'
@@ -438,7 +434,7 @@ if __name__=='__main__':
         name = args.filename[:-10]
         date = args.filename[-10:]
         fileDir = 'measurements/' + date +'/'
-        fileDir = fileDir + args.filename + '.pkl'
+        fileDir = fileDir + args.filename + '.csv'
 
     # saving arguments to variables
     threshold = args.threshold
@@ -447,42 +443,38 @@ if __name__=='__main__':
 
     xs = np.array(np.arange(start=MINDISTANCE, stop=MAXDISTANCE, step=(MAXDISTANCE-MINDISTANCE)/128))
 
-    try:
-        file = open(fileDir,'rb')
-    except:
-        print("File does not exist")
-
+#----------------
+    traj_angle, real_traj, curves = readcsv.read_csv_measurements(fileDir)
     # reading file and saving distances
-    traj_angle_dict = 0
-    distances_date_tuple_list = []
-    file_len_counter = 0
-    while True:
-        try:
-            if file_len_counter == 0:
-                traj_angle_dict = pkl.load(file)
-                print(traj_angle_dict)
-            else:
-                real_traj = pkl.load(file)
-                distances_date_tuple_list.append(pkl.load(file))
-            file_len_counter += 1
-        except:
-            break
-    file.close()
+    # traj_angle_dict = 0
+    # distances_date_tuple_list = []
+    # file_len_counter = 0
+    # while True:
+    #     try:
+    #         if file_len_counter == 0:
+    #             traj_angle_dict = pkl.load(file)
+    #             print(traj_angle_dict)
+    #         else:
+    #             real_traj = pkl.load(file)
+    #             distances_date_tuple_list.append(pkl.load(file))
+    #         file_len_counter += 1
+    #     except:
+    #         break
+    # file.close()
+#---------------------
     print(real_traj)
     # saving target angles
-    n_iterations = file_len_counter-1
-    print(distances_date_tuple_list)
-    n_points = len(distances_date_tuple_list[0]) #<------------cambiar para determinar n de puntos
+    print(curves)
+    n_points = len(curves) #<------------cambiar para determinar n de puntos
 
     phi_angles = np.zeros(n_points)
     theta_angles = np.zeros(n_points)
 
     for i in range(n_points):
-        phi_angles[i] = traj_angle_dict["traj"][i][0]
-        theta_angles[i] = traj_angle_dict["traj"][i][1]
+        phi_angles[i] = traj_angle[i][0]
+        theta_angles[i] = traj_angle[i][1]
 
-    distances = np.zeros((n_iterations,n_points)) # [iter][distance]
-    curves = []
+    distances = np.zeros((1,n_points)) # [iter][distance]
 
     titles = ['mean']
     XYZsplines = {}
@@ -490,9 +482,7 @@ if __name__=='__main__':
     for i in range(len(titles)):
         angle_rep = 0 #<-- debe poder leerse desde la data
         for j in range(n_points):
-            curves_jpoint = np.array(distances_date_tuple_list[0][j][1]) #
-            distances[0][j] = distanceFinder.distanceSplines(curves_jpoint, threshold,MINDISTANCE,MAXDISTANCE, 3, 1)
-            curves.append(curves_jpoint)
+            distances[0][j] = distanceFinder.distanceSplines(curves[j], threshold,MINDISTANCE,MAXDISTANCE, 3, 1)
 
             # distances[i] corresponds to the measured distances for the i-th iteration
             # plots using the visualization set as argument

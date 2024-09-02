@@ -1,7 +1,5 @@
 import csv
 import numpy as np
-import ast  # Para convertir strings en listas de manera segura
-
 
 def  tuple2float(strtuple):
         # estructura de strtuple '([signo]wx,[signo]yz)'
@@ -27,7 +25,7 @@ def  tuple2int(strtuple):
         return (az,el)
  
 
-def read_csv_to_numpy(filename):
+def read_csv_measurements(filename):
     az_encoder_positions = []
     el_encoder_positions = []
     az_positions = []
@@ -66,11 +64,3 @@ def read_csv_to_numpy(filename):
     real_trajectory_np = np.column_stack((az_encoder_positions_np, el_encoder_positions_np))
 
     return trajectory_np, real_trajectory_np, curves_np
-
-# Ejemplo de uso:
-filename = 'measurements/2024-09-02/prueba_piso_1_r0:3.0_rmax:30.0_2024-09-02.csv'
-trajectory, real_trajectory, measured_curves = read_csv_to_numpy(filename)
-
-print("Trajectory:\n", trajectory)
-print("Real Trajectory:\n", real_trajectory)
-print("\nMeasured Curves:\n", measured_curves)
