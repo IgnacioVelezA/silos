@@ -161,7 +161,7 @@ if __name__ == '__main__':
                 time.sleep(0.1)
                 if attempt_i == max_attempts - 1:
                     print(f'Max attempts done, using nominal position for point {i} in az')
-                    az_real_position = traj[i][0]
+                    az_real_position = 5600
 
         for attempt_i in range(max_attempts):
             try:
@@ -172,7 +172,7 @@ if __name__ == '__main__':
                 time.sleep(0.1)
                 if attempt_i == max_attempts - 1:
                     print(f'Max attempts done, using nominal position for point {i} in el')
-                    el_real_position = traj[i][1]
+                    el_real_position =5601
                         
         real_position = (az_real_position, el_real_position)
 

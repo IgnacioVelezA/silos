@@ -248,7 +248,8 @@ def plotCut(XYZcoords, spline, xcut = False, ycut = False, step_angle = 3):
     return Xcuts, Ycuts, Zcuts
         
 
-#////END: plotCut =====================================================================================
+#////END: plotCut =================================================================================
+
 def correct_real_traj(traj_measured):
     offset_cero_azimutal = traj_measured[0][0]
     offset_cero_elev = traj_measured[0][1]
@@ -259,7 +260,6 @@ def correct_real_traj(traj_measured):
         elevation_encoder = (offset_cero_elev - traj_measured[punto_i][1]) * 90/1024
         real_traj_corr.append((azimutal_encoder, elevation_encoder))
     return real_traj_corr
-
 
 #////plot_with_encoder ===============================================================================
 def plot_with_encoder(traj_measured, distance_measurements, minAxis, maxAxis, titlei = False):
@@ -452,8 +452,6 @@ if __name__=='__main__':
     except:
         print("File does not exist")
 
-
-    # Reading file
     # reading file and saving distances
     traj_angle_dict = 0
     distances_date_tuple_list = []
@@ -471,7 +469,6 @@ if __name__=='__main__':
             break
     file.close()
     print(real_traj)
-
     # saving target angles
     n_iterations = file_len_counter-1
     print(distances_date_tuple_list)

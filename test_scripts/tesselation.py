@@ -6,8 +6,8 @@ def volumen_un_prisma(vertices2d, verticesZ):
 	
 	a, b, c = vertices2d
 	altura = (verticesZ[0] + verticesZ[1] + verticesZ[2])/3
-	restando1 = abs(b[0] - a[0])*abs(c[1] - a[1])
-	restando2 = abs(c[0] - a[0])*abs(b[1] - a[1])
+	restando1 = (b[0] - a[0])*(c[1] - a[1])
+	restando2 = (c[0] - a[0])*(b[1] - a[1])
 
 	area = abs(restando1 - restando2)/2
 	volumen = altura*area
@@ -27,8 +27,8 @@ def tesselation(xypoints):
 
 
 # Number of random points
-num_points = 1000000
-cube_shape = (num_points,num_points)
+num_points = 10000
+cube_shape = (num_points/2,num_points/5)
 # Generate random x and y coordinates and store them in a 2D numpy array
 points = np.random.rand(num_points, 2)  # Each row is a point [x, y]
 
@@ -49,11 +49,11 @@ for zi in range(len(z)):
 
 	#z[zi] = z[zi] + np.random.normal(0,0.1,1)
 # Create the plot
-#fig = plt.figure()
+fig = plt.figure()
 
-#ax = fig.add_subplot(1,1,1, projection='3d')
-#ax.set_box_aspect([1,1,1])
-#ax.scatter(x, y,z, c=z, cmap="gist_rainbow",alpha=1)
+ax = fig.add_subplot(1,1,1, projection='3d')
+ax.set_box_aspect([1,1,1])
+ax.scatter(x, y,z, c=z, cmap="gist_rainbow",alpha=1)
 #ax.title('Random Point Cloud')
 vertices_indexs = tesselation(points)
 
@@ -70,6 +70,6 @@ print(volumen)
 # ax.set_ylabel('y axis(Vertical)')
 # ax.set_xlabel('x axis (Horizontal)')
 # ax.grid(True)
-# plt.show()
+plt.show()
 
 
