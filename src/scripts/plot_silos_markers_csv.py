@@ -114,7 +114,7 @@ def plot_measure(theta_list, phi_list, distance_measurements, minAxis, maxAxis, 
             fig.show()
         else:
             break
-    return vertices
+    return [X,Y,Z]
 #////END: plot_measure=============================================================================
 
 
@@ -184,8 +184,6 @@ def curveComparison(crvindx):
     plt.ylabel('Power')
     plt.legend()
     plt.show()
-
-
 #////END: curveComparison==========================================================================
 
 
@@ -242,24 +240,32 @@ def plotCut(XYZcoords, spline, xcut = False, ycut = False, step_angle = 3):
         
     fig2.show()
     return Xcuts, Ycuts, Zcuts
-        
-
 #////END: plotCut =================================================================================
 
-def correct_real_traj(traj_measured):
+
+def correct_real_traj(traj_measured, traj_commanded):
     offset_cero_azimutal = traj_measured[0][0]
     offset_cero_elev = traj_measured[0][1]
     real_traj_corr = []
 
     for punto_i in range(len(real_traj)):
-        azimutal_encoder = (offset_cero_azimutal - traj_measured[punto_i][0] ) * 90/1024
-        elevation_encoder = (offset_cero_elev - traj_measured[punto_i][1]) * 90/1024
+        if traj_measured[punto_i][0] == 5601:
+            azimutal_encoder = traj_commanded[punto_i][0]
+        else:
+            azimutal_encoder = (offset_cero_azimutal - traj_measured[punto_i][0] ) * 90/1024
+        
+        if traj_measured[punto_i][1] == 5600:
+            azimutal_encoder = traj_commanded[punto_i][1]
+        else:
+            elevation_encoder = (offset_cero_elev - traj_measured[punto_i][1]) * 90/1024
+
         real_traj_corr.append((azimutal_encoder, elevation_encoder))
     return real_traj_corr
 
+
 #////plot_with_encoder ===============================================================================
-def plot_with_encoder(traj_measured, distance_measurements, minAxis, maxAxis, titlei = False):
-    real_traj_corr = correct_real_traj(traj_measured)
+def plot_with_encoder(traj_measured,traj_commanded, distance_measurements, minAxis, maxAxis, titlei = False):
+    real_traj_corr = correct_real_traj(traj_measured, traj_commanded)
     print(real_traj_corr)
     theta_list_rad = [value[1] * np.pi/180 for value in real_traj_corr]
     phi_list_rad = [value[0] * np.pi/180 for value in real_traj_corr]
@@ -305,7 +311,7 @@ def plot_with_encoder(traj_measured, distance_measurements, minAxis, maxAxis, ti
         zaxis=dict(title='Eje Z', range = [-maxAxis,minAxis]),
         ),title = "Using encoders")
         
-#fig.colorbar(scatter, shrink=0.5, aspect=5, label = "Distance [m]")
+    #fig.colorbar(scatter, shrink=0.5, aspect=5, label = "Distance [m]")
 
     fig.show()
 
@@ -340,29 +346,10 @@ def plot_with_encoder(traj_measured, distance_measurements, minAxis, maxAxis, ti
                 text = mark
                 ))
 
-                # fig.update_layout(scene=dict(
-                #     xaxis=dict(title='Eje X'),
-                #     yaxis=dict(title='Eje Y'),
-                #     zaxis=dict(title='Eje Z', range = [minAxis, maxAxis]),
-                #     ),title = titlei)
-
             fig.show()
         else:
             break
     return [X, Y, Z]
-
-# def volume_calculator(xyzpoints):
-#     X,Y,Z = XYZcoords
-#     xypoints = np.array([X,Y])
-#     tri.delaunay(xypoints)
-#     indices = tri.simplices
-#     volume = 0
-#     for triangle_i in indices:
-        
-# def prism_volume_calculator(vertices): #vertices contains x,y,z of the top vertices
-#     ver1,ver2,ver3 = vertices
-#     mean_altitude = (ver1[2]+ver2[2]+ver3[2])/3
-#     triangle_area = 
 
 
 def tesselation(X,Y):
@@ -370,7 +357,7 @@ def tesselation(X,Y):
 
     for coord_i in range(len(X)):
         xypoints.append([X[coord_i], Y[coord_i]])
-    print(xypoints)
+    #print(xypoints)
     xypoints = np.array(xypoints)
     tri = Delaunay(xypoints)
     indices = tri.simplices
@@ -413,8 +400,9 @@ def volumen(X,Y,Z):
         vertices_triangulo_i = np.array(vertices_triangulo_i)
         alturas_triangulo_i = np.array(alturas_triangulo_i)
         volumen += volumen_un_prisma(vertices_triangulo_i, alturas_triangulo_i)
-    print(altura)
+   # print(altura)
     return volumen
+
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser(description='plots a silos measurement'+
@@ -443,28 +431,11 @@ if __name__=='__main__':
 
     xs = np.array(np.arange(start=MINDISTANCE, stop=MAXDISTANCE, step=(MAXDISTANCE-MINDISTANCE)/128))
 
-#----------------
     traj_angle, real_traj, curves = readcsv.read_csv_measurements(fileDir)
-    # reading file and saving distances
-    # traj_angle_dict = 0
-    # distances_date_tuple_list = []
-    # file_len_counter = 0
-    # while True:
-    #     try:
-    #         if file_len_counter == 0:
-    #             traj_angle_dict = pkl.load(file)
-    #             print(traj_angle_dict)
-    #         else:
-    #             real_traj = pkl.load(file)
-    #             distances_date_tuple_list.append(pkl.load(file))
-    #         file_len_counter += 1
-    #     except:
-    #         break
-    # file.close()
-#---------------------
-    print(real_traj)
+
+    #print(real_traj)
     # saving target angles
-    print(curves)
+    #print(curves)
     n_points = len(curves) #<------------cambiar para determinar n de puntos
 
     phi_angles = np.zeros(n_points)
@@ -488,7 +459,7 @@ if __name__=='__main__':
             # plots using the visualization set as argument
 
         XYZcoords = plot_measure(theta_angles, phi_angles, distances[0], MINDISTANCE,MAXDISTANCE, titlei = titles[i])
-        [X, Y, Z] = plot_with_encoder(real_traj, distances[0], MINDISTANCE,MAXDISTANCE, titlei = titles[i])
+        XYZ_real = plot_with_encoder(real_traj, traj_angle, distances[0], MINDISTANCE,MAXDISTANCE, titlei = titles[i])
         #XYZsplines[titles[i]] = [X,Y,Z]
-
+    print(volumen(XYZcoords[0], XYZcoords[1], XYZcoords[2]))
     # curves[i][j] corresponds to the curve of the j-th point of the i-th iteration
