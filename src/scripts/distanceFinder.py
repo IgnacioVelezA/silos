@@ -57,7 +57,7 @@ def LocalMaxDetector(curve_array):
 
 
 #////distanceFinder================================================================================
-def distanceFinder(curve, minAmp, MINDISTANCE, MAXDISTANCE, jump):
+def distanceFinder(curve, minAmp, MINDISTANCE, MAXDISTANCE, jump, returnCurve = False):
     if jump < MINDISTANCE or jump > MAXDISTANCE:
         print('Jump distance (in meters) not in range, using normal curve')
         jump = MINDISTANCE
@@ -85,9 +85,11 @@ def distanceFinder(curve, minAmp, MINDISTANCE, MAXDISTANCE, jump):
         while i< len(localMax):
             if localMax[i]:
                 if cleaned_curve[i] >= maxPeak - minAmp:
-                    return i*xstep + MINDISTANCE
+                    return i*xstep + jump
             i +=1
     distance = maxIndex*xstep + jump
+    if returnCurve:
+        return distance, cleaned_curve
     return distance
 #////END: distanceFinder===========================================================================
 
@@ -95,6 +97,9 @@ def distanceFinder(curve, minAmp, MINDISTANCE, MAXDISTANCE, jump):
 #////DistanceSplines ==============================================================================
 
 def distanceSplines(curve_og, minAmp, MINDISTANCE, MAXDISTANCE, jump ,spline =0):
+    if jump < MINDISTANCE or jump > MAXDISTANCE:
+        print('Jump distance (in meters) not in range, using normal curve')
+        jump = MINDISTANCE
 
     x = np.linspace(MINDISTANCE,MAXDISTANCE,128)
     x_interpl = np.linspace(MINDISTANCE,MAXDISTANCE,2048)
@@ -104,29 +109,28 @@ def distanceSplines(curve_og, minAmp, MINDISTANCE, MAXDISTANCE, jump ,spline =0)
 
     x = np.linspace(MINDISTANCE,MAXDISTANCE,128)
 
-    # curve meaing --------------------------------------
-    curve_mean[0] = (curve_og[0]+curve_og[1])/3
-    for i in range(len(curve_og)-2):
-        curve_mean[i+1] = (curve_og[i]+curve_og[i+1]+curve_og[i+2])/3 
+    # curve averaging --------------------------------------
+    # curve_mean[0] = (curve_og[0]+curve_og[1])/3
+    # for i in range(len(curve_og)-2):
+    #     curve_mean[i+1] = (curve_og[i]+curve_og[i+1]+curve_og[i+2])/3 
 
-    i += 1
+    # i += 1
 
-    curve_mean[i+1] = (curve_og[i]+curve_og[i+1])/3
-    # end: curve meaning --------------------------------
+    # curve_mean[i+1] = (curve_og[i]+curve_og[i+1])/3
+    curve_mean = np.convolve(curve_og, np.ones(5)/5, mode='same')
+    # end: curve averaging --------------------------------
 
     xy_spline = interp1d(x, curve_og)
     mean_spline = interp1d(x, curve_mean)
 
-    interpl_curve = xy_spline(x_interpl)
-    interpl_meancurve = mean_spline(x_interpl)
-
     cubicSP = CubicSpline(x, curve_og)
     
     interpl_cubicSP_curve = cubicSP(x_interpl)
+    interpl_meancurve = mean_spline(x_interpl)
 
     # Jumping method -----------------------------------
     jump_indx = math.ceil((jump - MINDISTANCE)/xstep)
-    cleaned_curve = interpl_cubicSP_curve[jump_indx:] # < Cambiar segun curva que se use
+    cleaned_curve = interpl_meancurve[jump_indx:]#interpl_cubicSP_curve[jump_indx:] # < Cambiar segun curva que se use
 
     maxPeak = max(cleaned_curve)
     maxIndex = np.argmax(cleaned_curve)
@@ -138,11 +142,12 @@ def distanceSplines(curve_og, minAmp, MINDISTANCE, MAXDISTANCE, jump ,spline =0)
         while i< len(localMax):
             if localMax[i]:
                 if cleaned_curve[i] >= maxPeak - minAmp:
-                    return i*xstep + MINDISTANCE
+                    return i*xstep + jump, interpl_meancurve, x_interpl
             i +=1
+
     distance = maxIndex*xstep + jump
-    
-    return distance
+
+    return distance, interpl_meancurve, x_interpl
 
         
 

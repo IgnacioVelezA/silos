@@ -121,17 +121,19 @@ def plot_measure(theta_list, phi_list, distance_measurements, minAxis, maxAxis, 
 #////plot_curve====================================================================================
 def plot_curve(i, xs, thr, jump ,title = ''):
     curve = curves[i]
-    distance = distanceFinder.distanceFinder(curve, thr ,MINDISTANCE,MAXDISTANCE, jump)
+    distance, cleaned_curve, x_interpl= distanceFinder.distanceSplines(curve, thr ,MINDISTANCE,MAXDISTANCE, jump)
     z = np.cos(theta_angles[i]*np.pi/180)*distance
 
 
     plt.plot(xs, curve)
+    plt.plot(x_interpl, cleaned_curve)
     plt.vlines(distance,0,50, label=f'radial={distance}')
     plt.xlabel('distance[m]')
     plt.ylabel('Power')
     plt.title(f'{title}, z = {z}')
     plt.legend()
     plt.show()
+    return cleaned_curve
 #////END: plot_curve===============================================================================
 
 
@@ -249,16 +251,18 @@ def correct_real_traj(traj_measured, traj_commanded):
     real_traj_corr = []
 
     for punto_i in range(len(real_traj)):
-        if traj_measured[punto_i][0] == 5601:
+        if traj_measured[punto_i][0] >= 5600:
             azimutal_encoder = traj_commanded[punto_i][0]
         else:
-            azimutal_encoder = (offset_cero_azimutal - traj_measured[punto_i][0] ) * 90/1024
-        
-        if traj_measured[punto_i][1] == 5600:
-            azimutal_encoder = traj_commanded[punto_i][1]
+            azimutal_encoder = (traj_measured[punto_i][0] - offset_cero_azimutal) * 90/1024
+            if azimutal_encoder > 180.0:
+                azimutal_encoder = azimutal_encoder - 360.0
+        if traj_measured[punto_i][1] >= 5600:
+            elevation_encoder = traj_commanded[punto_i][1]
         else:
-            elevation_encoder = (offset_cero_elev - traj_measured[punto_i][1]) * 90/1024
-
+            elevation_encoder = -(traj_measured[punto_i][1]- offset_cero_elev) * 90/1024
+            if azimutal_encoder > 180.0:
+                azimutal_encoder = azimutal_encoder - 360.0
         real_traj_corr.append((azimutal_encoder, elevation_encoder))
     return real_traj_corr
 
@@ -289,9 +293,9 @@ def plot_with_encoder(traj_measured,traj_commanded, distance_measurements, minAx
            Z[i] = -35
 
     # Configures the figure based on the chosen visualization
-    fig = go.Figure()
+    fig2 = go.Figure()
 
-    scatter = fig.add_trace(go.Scatter3d(
+    scatter = fig2.add_trace(go.Scatter3d(
         x=X,
         y=Y,
         z=Z,
@@ -305,7 +309,7 @@ def plot_with_encoder(traj_measured,traj_commanded, distance_measurements, minAx
         text = index
         ))
 
-    fig.update_layout(scene=dict(
+    fig2.update_layout(scene=dict(
         xaxis=dict(title='Eje X'),
         yaxis=dict(title='Eje Y'),
         zaxis=dict(title='Eje Z', range = [-maxAxis,minAxis]),
@@ -313,15 +317,15 @@ def plot_with_encoder(traj_measured,traj_commanded, distance_measurements, minAx
         
     #fig.colorbar(scatter, shrink=0.5, aspect=5, label = "Distance [m]")
 
-    fig.show()
+    fig2.show()
 
     while True:
         mark = input('Indice (just enter to break):')
         if mark:
             #if mark == x:
             indxMark = int(mark)
-            fig = go.Figure()
-            scatter = fig.add_trace(go.Scatter3d(
+            fig2 = go.Figure()
+            scatter = fig2.add_trace(go.Scatter3d(
                 x=X,
                 y=Y,
                 z=Z,
@@ -334,7 +338,7 @@ def plot_with_encoder(traj_measured,traj_commanded, distance_measurements, minAx
                 ),
                 text = index
                 ))
-            scatter = fig.add_trace(go.Scatter3d(
+            scatter = fig2.add_trace(go.Scatter3d(
                 x=[X[indxMark]],
                 y=[Y[indxMark]],
                 z=[Z[indxMark]],
@@ -346,10 +350,10 @@ def plot_with_encoder(traj_measured,traj_commanded, distance_measurements, minAx
                 text = mark
                 ))
 
-            fig.show()
+            fig2.show()
         else:
             break
-    return [X, Y, Z]
+    return [X, Y, Z], real_traj_corr
 
 
 def tesselation(X,Y):
@@ -453,13 +457,13 @@ if __name__=='__main__':
     for i in range(len(titles)):
         angle_rep = 0 #<-- debe poder leerse desde la data
         for j in range(n_points):
-            distances[0][j] = distanceFinder.distanceSplines(curves[j], threshold,MINDISTANCE,MAXDISTANCE, 3, 1)
+            distances[0][j], _, _ = distanceFinder.distanceSplines(curves[j], threshold,MINDISTANCE,MAXDISTANCE, 5, 1)
 
             # distances[i] corresponds to the measured distances for the i-th iteration
             # plots using the visualization set as argument
 
         XYZcoords = plot_measure(theta_angles, phi_angles, distances[0], MINDISTANCE,MAXDISTANCE, titlei = titles[i])
-        XYZ_real = plot_with_encoder(real_traj, traj_angle, distances[0], MINDISTANCE,MAXDISTANCE, titlei = titles[i])
+        XYZ_real, real_traj_corr = plot_with_encoder(real_traj, traj_angle, distances[0], MINDISTANCE,MAXDISTANCE, titlei = titles[i])
         #XYZsplines[titles[i]] = [X,Y,Z]
     print(volumen(XYZcoords[0], XYZcoords[1], XYZcoords[2]))
     # curves[i][j] corresponds to the curve of the j-th point of the i-th iteration

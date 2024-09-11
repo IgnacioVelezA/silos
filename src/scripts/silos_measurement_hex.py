@@ -83,11 +83,6 @@ if __name__ == '__main__':
         suffix = args.filename + '_' + params + '_' + str(todays_date) + '.csv'
     
     nameSD = nameSD + suffix
-    
-    # Initialize CSV file with headers
-    with open(nameSD, mode='w', newline='') as fileSD:
-        writer = csv.writer(fileSD)
-        writer.writerow(['Measure Time', 'Commanded trajectory', 'Real trajectory', 'Curve'])
 
     # Initializing radar serial comm
     serial_radar.open_serial(args.radar_usb_port)
@@ -128,8 +123,14 @@ if __name__ == '__main__':
     el_motor.move(0)
     
     print("Both motors are initialized")
-    
-    data_counter = 0
+
+    az_LS_position = az_motor.LS_angle_meassured
+    el_LS_position = el_motor.LS_angle_meassured
+
+    # Initialize CSV file with headers
+    with open(nameSD, mode='w', newline='') as fileSD:
+        writer = csv.writer(fileSD)
+        writer.writerow(['Measure Time', 'Commanded trajectory', 'Real trajectory', 'Curve', 'az LS', az_LS_position, 'el LS', el_LS_position])    
     
     # Pointing and measuring the corresponding angles
     ltraj = len(traj)

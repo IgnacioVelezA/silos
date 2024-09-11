@@ -8,8 +8,6 @@ def  tuple2float(strtuple):
         coords = strtuple.split(',')
         az = float(coords[0])
         el = float(coords[1]) 
-        print(f'az: {az}')
-        print(f'el: {el}')
         return (az,el)
 
 
@@ -20,8 +18,6 @@ def  tuple2int(strtuple):
         coords = strtuple.split(',')
         az = int(coords[0])
         el = int(coords[1]) 
-        print(f'az: {az}')
-        print(f'el: {el}')
         return (az,el)
  
 
@@ -43,8 +39,6 @@ def read_csv_measurements(filename):
             az_encoder_position, el_encoder_position = tuple2int(row[2])            
             az_encoder_positions.append(az_encoder_position)
             el_encoder_positions.append(el_encoder_position)
-
-            print('------')
             # Procesar la cadena de la curva para agregar comas entre los números
             curve_str = row[3].replace('  ', ' ')  # Reemplaza dobles espacios por un solo espacio
             curve_list = [int(num) for num in curve_str.strip('[]').split()]  # Convierte la cadena en una lista de números
