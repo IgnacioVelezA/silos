@@ -245,22 +245,22 @@ def plotCut(XYZcoords, spline, xcut = False, ycut = False, step_angle = 3):
 #////END: plotCut =================================================================================
 
 
-def correct_real_traj(traj_measured, traj_commanded):
-    offset_cero_azimutal = traj_measured[0][0]
-    offset_cero_elev = traj_measured[0][1]
+def correct_real_traj(traj_measured, traj_commanded, LS_positions):
+    offset_LS_azimutal = LS_positions[0]
+    offset_LS_elev = LS_positions[1]
     real_traj_corr = []
 
     for punto_i in range(len(real_traj)):
         if traj_measured[punto_i][0] >= 5600:
             azimutal_encoder = traj_commanded[punto_i][0]
         else:
-            azimutal_encoder = (traj_measured[punto_i][0] - offset_cero_azimutal) * 90/1024
+            azimutal_encoder = 102 - (offset_LS_azimutal - traj_measured[punto_i][0]) * 90/1024
             if azimutal_encoder > 180.0:
                 azimutal_encoder = azimutal_encoder - 360.0
         if traj_measured[punto_i][1] >= 5600:
             elevation_encoder = traj_commanded[punto_i][1]
         else:
-            elevation_encoder = -(traj_measured[punto_i][1]- offset_cero_elev) * 90/1024
+            elevation_encoder = 39 + (offset_LS_elev - traj_measured[punto_i][1]) * 90/1024
             if azimutal_encoder > 180.0:
                 azimutal_encoder = azimutal_encoder - 360.0
         real_traj_corr.append((azimutal_encoder, elevation_encoder))
@@ -268,8 +268,8 @@ def correct_real_traj(traj_measured, traj_commanded):
 
 
 #////plot_with_encoder ===============================================================================
-def plot_with_encoder(traj_measured,traj_commanded, distance_measurements, minAxis, maxAxis, titlei = False):
-    real_traj_corr = correct_real_traj(traj_measured, traj_commanded)
+def plot_with_encoder(traj_measured,traj_commanded, distance_measurements, minAxis, maxAxis, LS_positions, titlei = False):
+    real_traj_corr = correct_real_traj(traj_measured, traj_commanded, LS_positions)
     print(real_traj_corr)
     theta_list_rad = [value[1] * np.pi/180 for value in real_traj_corr]
     phi_list_rad = [value[0] * np.pi/180 for value in real_traj_corr]
@@ -435,7 +435,7 @@ if __name__=='__main__':
 
     xs = np.array(np.arange(start=MINDISTANCE, stop=MAXDISTANCE, step=(MAXDISTANCE-MINDISTANCE)/128))
 
-    traj_angle, real_traj, curves = readcsv.read_csv_measurements(fileDir)
+    traj_angle, real_traj, curves, LS_positions = readcsv.read_csv_measurements(fileDir)
 
     #print(real_traj)
     # saving target angles
@@ -463,7 +463,7 @@ if __name__=='__main__':
             # plots using the visualization set as argument
 
         XYZcoords = plot_measure(theta_angles, phi_angles, distances[0], MINDISTANCE,MAXDISTANCE, titlei = titles[i])
-        XYZ_real, real_traj_corr = plot_with_encoder(real_traj, traj_angle, distances[0], MINDISTANCE,MAXDISTANCE, titlei = titles[i])
+        XYZ_real, real_traj_corr = plot_with_encoder(real_traj, traj_angle, distances[0], MINDISTANCE,MAXDISTANCE, LS_positions,titlei = titles[i])
         #XYZsplines[titles[i]] = [X,Y,Z]
     print(volumen(XYZcoords[0], XYZcoords[1], XYZcoords[2]))
     # curves[i][j] corresponds to the curve of the j-th point of the i-th iteration

@@ -30,7 +30,14 @@ def read_csv_measurements(filename):
 
     with open(filename, 'r') as file:
         reader = csv.reader(file)
-        next(reader)  # Saltar la fila de encabezado
+        header = next(reader)  # Saltar la fila de encabezado
+
+        az_LS_position = int(header[5])
+        el_LS_position = int(header[7])
+        print('ls position debugging')
+        print(az_LS_position)
+        print(el_LS_position)
+        LS_positions = [az_LS_position,el_LS_position]
 
         for row in reader:
             az_position, el_position = tuple2float(row[1])           
@@ -57,4 +64,4 @@ def read_csv_measurements(filename):
     trajectory_np = np.column_stack((az_positions_np, el_positions_np))
     real_trajectory_np = np.column_stack((az_encoder_positions_np, el_encoder_positions_np))
 
-    return trajectory_np, real_trajectory_np, curves_np
+    return trajectory_np, real_trajectory_np, curves_np, LS_positions
