@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import numpy as np
 import argparse
-from src.test_scripts import distanceFinder
+from src.scripts import distanceFinder
 
 
 
@@ -12,7 +12,7 @@ def curve_analizer(curve, thr, mindist, maxdist):
     std = round(np.std(curve),2)
     mean = round(np.mean(curve),2)
     max_index = np.argmax(curve)
-    distance = distanceFinder.distanceFinder(curve, thr, MINDISTANCE, MAXDISTANCE,0)
+    distance = distanceFinder.distanceSplines(curve, thr, MINDISTANCE, MAXDISTANCE,0)
     return distance, mean, std
 
 #////END: curve_analizer =====================================================================
