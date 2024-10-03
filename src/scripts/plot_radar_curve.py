@@ -28,13 +28,15 @@ def animate(i, xs, thr, mindist, maxdist):
 
     ys = np.array(curve)
     max_power = max(ys)
-    distance, mean, std = curve_analizer(ys, thr, mindist, maxdist)
-
+    #distance, mean, std = curve_analizer(ys, thr, mindist, maxdist)
+    distance, cleaned_curve, x_interpl= distanceFinder.distanceSplines(curve, thr ,MINDISTANCE,MAXDISTANCE, 0)
     # Draw x and y lists
     ax.clear()
     ax.plot(xs, ys,label="original")
-    ax.axvline(x = distance, color = 'red', label = f'distance: {distance}')
-    ax.axhline(y = mean, color = 'green', label = f'average: {mean} \n standar dev: {std} \n maxPW = {max_power}')
+    plt.plot(x_interpl, cleaned_curve)
+    plt.vlines(distance,0,50, label=f'radial={distance}')
+    # ax.axvline(x = distance, color = 'red', label = f'distance: {distance}')
+    # ax.axhline(y = mean, color = 'green', label = f'average: {mean} \n standar dev: {std} \n maxPW = {max_power}')
     ax.set_ylim([0,100])
     #ax.plot(new_x, new_y,label="smooth")
 
