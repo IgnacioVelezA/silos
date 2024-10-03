@@ -32,7 +32,7 @@ def animate(i, xs, thr, mindist, maxdist):
     distance, cleaned_curve, x_interpl= distanceFinder.distanceSplines(ys, thr ,MINDISTANCE,MAXDISTANCE, 0)
     # Draw x and y lists
     ax.clear()
-    ax.plot(xs, ys,label="original")
+    #ax.plot(xs, ys,label="original")
     ax.plot(x_interpl, cleaned_curve)
     ax.vlines(distance,0,50, label=f'radial={distance}')
     # ax.axvline(x = distance, color = 'red', label = f'distance: {distance}')
