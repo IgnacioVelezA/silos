@@ -254,7 +254,7 @@ def correct_real_traj(traj_measured, traj_commanded, LS_positions):
         if traj_measured[punto_i][0] >= 5600:
             azimutal_encoder = traj_commanded[punto_i][0]
         else:
-            azimutal_encoder = 102 - (offset_LS_azimutal - traj_measured[punto_i][0]) * 90/1024
+            azimutal_encoder = 92 - (offset_LS_azimutal - traj_measured[punto_i][0]) * 90/1024
             if azimutal_encoder > 180.0:
                 azimutal_encoder = azimutal_encoder - 360.0
         if traj_measured[punto_i][1] >= 5600:
