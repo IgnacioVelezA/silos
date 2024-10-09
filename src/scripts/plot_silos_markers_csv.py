@@ -268,11 +268,12 @@ def correct_real_traj(traj_measured, traj_commanded, LS_positions):
 
 
 #////plot_with_encoder ===============================================================================
-def plot_with_encoder(traj_measured,traj_commanded, distance_measurements, minAxis, maxAxis, LS_positions, titlei = False):
+def plot_with_encoder(phi_list, traj_measured,traj_commanded, distance_measurements, minAxis, maxAxis, LS_positions, titlei = False):
     real_traj_corr = correct_real_traj(traj_measured, traj_commanded, LS_positions)
     print(real_traj_corr)
     theta_list_rad = [value[1] * np.pi/180 for value in real_traj_corr]
-    phi_list_rad = [value[0] * np.pi/180 for value in real_traj_corr]
+    #phi_list_rad = [value[0] * np.pi/180 for value in real_traj_corr]
+    phi_list_rad = [value * np.pi/180 for value in phi_list]
 
     X = np.zeros(len(distance_measurements))
     Y = np.zeros(len(distance_measurements))
@@ -463,7 +464,7 @@ if __name__=='__main__':
             # plots using the visualization set as argument
 
         XYZcoords = plot_measure(theta_angles, phi_angles, distances[0], MINDISTANCE,MAXDISTANCE, titlei = titles[i])
-        XYZ_real, real_traj_corr = plot_with_encoder(real_traj, traj_angle, distances[0], MINDISTANCE,MAXDISTANCE, LS_positions,titlei = titles[i])
+        XYZ_real, real_traj_corr = plot_with_encoder(phi_angles, real_traj, traj_angle, distances[0], MINDISTANCE,MAXDISTANCE, LS_positions,titlei = titles[i])
         #XYZsplines[titles[i]] = [X,Y,Z]
     print(volumen(XYZcoords[0], XYZcoords[1], XYZcoords[2]))
     # curves[i][j] corresponds to the curve of the j-th point of the i-th iteration
