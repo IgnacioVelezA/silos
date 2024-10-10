@@ -39,7 +39,7 @@ def all_levels(dist_cent, total_levels):
 
     return centers_for_level
 
-def hex_trajectory(dist_cent, rmax, set_offset_el = True, offset_elev_degree = 10):
+def hex_trajectory(dist_cent, rmax, set_offset_el = True, offset_elev_degree = 5):
     """
     Returns a tuple list with az and el points of a hexagonal trajectory
     to measure given radio0 wich defines the radar's HPBW, and a rmax
@@ -77,5 +77,7 @@ def offset_elev(trajectory, offset_degree = 5.0):
         vector_az = trajectory[vector][0]
         vector_el = trajectory[vector][1]
         if vector_el > 0.0:
-            trajectory[vector] = (vector_az, vector_el-offset_degree)
+            trajectory[vector] = (vector_az, vector_el*4/3)
+        if vector_el < 0.0:
+            trajectory[vector] = (vector_az, vector_el*3/4)
     return trajectory
