@@ -70,7 +70,7 @@ if __name__ == '__main__':
     # Defining wait time for radar
     radar_measure_wait_time = args.radar_wait_time
 
-    traj = hex_trajectory.hex_trajectory(RADIO_BEAM, RADIO_SURFACE, set_offset_el=False)
+    traj = hex_trajectory.hex_trajectory(RADIO_BEAM, RADIO_SURFACE, set_offset_el=True, offset_elev_degree = 10.0)
 
     time.sleep(1)
     todays_date = date.today()      
@@ -101,7 +101,7 @@ if __name__ == '__main__':
 
     az_motor = stepper_motor.stepper_motor(id=1, speed=0, max_speed=400, acceleration=600)
     az_motor.add_limit_switch(12, -90)
-    az_motor.add_limit_switch(22, 92)
+    az_motor.add_limit_switch(22, 9)
     time.sleep(1)
 
     el_motor = stepper_motor.stepper_motor(id=2, speed=0, max_speed=400, acceleration=600)

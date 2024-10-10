@@ -293,6 +293,7 @@ def plot_with_encoder(phi_list, traj_measured,traj_commanded, distance_measureme
         if distance_measurements[i] > 30:
            Z[i] = -35
 
+    title = titlei + '\n Using encoders'
     # Configures the figure based on the chosen visualization
     fig2 = go.Figure()
 
@@ -314,7 +315,7 @@ def plot_with_encoder(phi_list, traj_measured,traj_commanded, distance_measureme
         xaxis=dict(title='Eje X'),
         yaxis=dict(title='Eje Y'),
         zaxis=dict(title='Eje Z', range = [-maxAxis,minAxis]),
-        ),title = "Using encoders")
+        ),title = title)
         
     #fig.colorbar(scatter, shrink=0.5, aspect=5, label = "Distance [m]")
 
@@ -418,16 +419,18 @@ if __name__=='__main__':
     parser.add_argument('-thr', '--threshold', default = 15, type = int)
     args = parser.parse_args()
 
-    if args.filename[-4:] == '.csv':
-        name = args.filename[:-14]
-        date = args.filename[-14:-4]
+    filename = args.filename
+
+    if filename[-4:] == '.csv':
+        name = filename[:-14]
+        date = filename[-14:-4]
         fileDir = 'measurements/' + date + '/'
-        fileDir = fileDir + args.filename
+        fileDir = fileDir + filename
     else:
-        name = args.filename[:-10]
-        date = args.filename[-10:]
+        name = filename[:-10]
+        date = filename[-10:]
         fileDir = 'measurements/' + date +'/'
-        fileDir = fileDir + args.filename + '.csv'
+        fileDir = fileDir + filename + '.csv'
 
     # saving arguments to variables
     threshold = args.threshold
@@ -452,19 +455,16 @@ if __name__=='__main__':
 
     distances = np.zeros((1,n_points)) # [iter][distance]
 
-    titles = ['mean']
-    XYZsplines = {}
 
-    for i in range(len(titles)):
-        angle_rep = 0 #<-- debe poder leerse desde la data
-        for j in range(n_points):
-            distances[0][j], _, _ = distanceFinder.distanceSplines(curves[j], threshold,MINDISTANCE,MAXDISTANCE, 5, 1)
+    for j in range(n_points):
+        distances[0][j], _, _ = distanceFinder.distanceSplines(curves[j], threshold,MINDISTANCE,MAXDISTANCE, 5, 1)
 
-            # distances[i] corresponds to the measured distances for the i-th iteration
-            # plots using the visualization set as argument
+        # distances[i] corresponds to the measured distances for the i-th iteration
+        # plots using the visualization set as argument
 
-        XYZcoords = plot_measure(theta_angles, phi_angles, distances[0], MINDISTANCE,MAXDISTANCE, titlei = titles[i])
-        XYZ_real, real_traj_corr = plot_with_encoder(phi_angles, real_traj, traj_angle, distances[0], MINDISTANCE,MAXDISTANCE, LS_positions,titlei = titles[i])
-        #XYZsplines[titles[i]] = [X,Y,Z]
+    filename = filename + ' con Umbral ' + str(threshold)
+    XYZcoords = plot_measure(theta_angles, phi_angles, distances[0], MINDISTANCE,MAXDISTANCE, titlei = filename)
+    XYZ_real, real_traj_corr = plot_with_encoder(phi_angles, real_traj, traj_angle, distances[0], MINDISTANCE,MAXDISTANCE, LS_positions,titlei =filename)
+    #XYZsplines[titles[i]] = [X,Y,Z]
     print(volumen(XYZcoords[0], XYZcoords[1], XYZcoords[2]))
     # curves[i][j] corresponds to the curve of the j-th point of the i-th iteration
