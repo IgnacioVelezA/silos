@@ -59,12 +59,12 @@ def hex_trajectory(dist_cent, rmax, set_offset_el = True, offset_elev_degree = 5
         elif x == 0 and y < 0:
             az = -90
         else:
-            az = round(np.arctan(y/x)*180/np.pi, 2)
+            az = round(np.arctan(y/x)*180/np.pi)
 
         if x < 0:
-            el = round(-np.sqrt(x**2 + y**2), 4)
+            el = round(-np.sqrt(x**2 + y**2))
         else:
-            el = round(np.sqrt(x**2 + y**2), 4)
+            el = round(np.sqrt(x**2 + y**2))
         trajectory.append((az, el))
 
     if set_offset_el == True:
@@ -77,7 +77,7 @@ def offset_elev(trajectory, offset_degree = 5.0):
         vector_az = trajectory[vector][0]
         vector_el = trajectory[vector][1]
         if vector_el > 0.0:
-            trajectory[vector] = (vector_az, vector_el*4/3)
+            trajectory[vector] = (vector_az, vector_el)
         if vector_el < 0.0:
-            trajectory[vector] = (vector_az, vector_el*3/4)
+            trajectory[vector] = (vector_az, vector_el)
     return trajectory
