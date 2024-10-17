@@ -65,17 +65,17 @@ def hex_trajectory(dist_cent, rmax, set_offset_el = True, offset_elev_degree = 5
             el = round(np.sqrt(x**2 + y**2))
         trajectory.append((az, el))
 
-    # if set_offset_el == True:
-    #     trajectory = offset_elev(trajectory, offset_elev_degree)
+    if set_offset_el == True:
+        trajectory = offset_elev(trajectory, offset_elev_degree)
 
     return trajectory   #, puntos
 
-# def offset_elev(trajectory, offset_degree = 5.0):
-#     for vector in range(len(trajectory)):
-#         vector_az = trajectory[vector][0]
-#         vector_el = trajectory[vector][1]
-#         if vector_el > 0.0:
-#             trajectory[vector] = (vector_az, vector_el)
-#         if vector_el < 0.0:
-#             trajectory[vector] = (vector_az, vector_el)
-#     return trajectory
+def offset_elev(trajectory, offset_degree = 5.0):
+    for vector in range(len(trajectory)):
+        vector_az = trajectory[vector][0]
+        vector_el = trajectory[vector][1]
+        if vector_el > 0.0:
+            trajectory[vector] = (vector_az, vector_el)
+        if vector_el < 0.0:
+            trajectory[vector] = (vector_az, vector_el)
+     return trajectory
