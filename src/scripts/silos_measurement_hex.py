@@ -70,7 +70,7 @@ if __name__ == '__main__':
     # Defining wait time for radar
     radar_measure_wait_time = args.radar_wait_time
 
-    traj =  hex_trajectory.hex_trajectory(RADIO_BEAM, RADIO_SURFACE, set_offset_el=True, offset_elev_degree = 5.0)
+    traj = [(90, 27), (84, 26), (78, 25), (72, 24), (65, 23), (58, 23), (50, 23), (44, 24), (37, 25), (30, 27), (24, 26), (18, 25), (12, 24), (5, 23), (-2, 23), (-10, 23), (-16, 24), (-23, 25), (-30, 27), (-36, 26), (-42, 25), (-48, 24), (-55, 23), (-62, 23), (-70, 23), (-76, 24), (-83, 25), (-90, 27), (84, -26), (78, -25), (72, -24), (65, -23), (58, -23), (50, -23), (44, -24), (37, -25), (30, -27), (24, -26), (18, -25), (12, -24), (5, -23), (-2, -23), (-10, -23), (-16, -24), (-23, -25), (-30, -27), (-36, -26), (-42, -25), (-48, -24), (-55, -23), (-62, -23), (-70, -23), (-76, -24)] #hex_trajectory.hex_trajectory(RADIO_BEAM, RADIO_SURFACE, set_offset_el=True, offset_elev_degree = 5.0)
 
     time.sleep(1)
     todays_date = date.today()      
