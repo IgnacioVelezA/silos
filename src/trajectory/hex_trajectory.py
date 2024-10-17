@@ -78,4 +78,4 @@ def offset_elev(trajectory, offset_degree = 5.0):
             trajectory[vector] = (vector_az, vector_el)
         if vector_el < 0.0:
             trajectory[vector] = (vector_az, vector_el)
-     return trajectory
+    return trajectory
