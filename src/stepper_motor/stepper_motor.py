@@ -224,16 +224,24 @@ class stepper_motor:
         return final_angle
 
 
-    def read_encoder(self):
+    def read_encoder(self, attempts = 5):
         bus_id = self.id -1 # motor 2 -> i2c bus 1, motor 1 -> i2c 0
         bus = smbus.SMBus(bus_id)
 
-        read_bytes = bus.read_i2c_block_data(ENCODER_ADRESS, 0x0C, 2)
-        raw_angle = (read_bytes[0]<<8) | read_bytes[1];
-        
-        SensorAngleDeg = raw_angle #* 90.0/1024;
+        for attempt_i in range(attempts):
+            try:
+                read_bytes = bus.read_i2c_block_data(ENCODER_ADRESS, 0x0C, 2)
+                raw_angle = (read_bytes[0]<<8) | read_bytes[1];
+                break
+            except:
+                print('An error occurred while reading encoders')
+                time.sleep(0.1)
+                if attempt_i == max_attempts - 1:
+                    print(f'Max attempts done, using nominal position for point {i} in az')
+                    raw_angle = 5600 + bus_id          
 
-        return SensorAngleDeg
+        return raw_angle
+
 
     # def get_encoder_angle(self):
 

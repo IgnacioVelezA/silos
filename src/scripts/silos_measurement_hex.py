@@ -154,27 +154,8 @@ if __name__ == '__main__':
             print("An exception occurred:", error)
             break
 
-        for attempt_i in range(max_attempts):
-            try:
-                az_real_position = az_motor.read_encoder()
-                break
-            except:
-                print('An error occurred while reading encoders')
-                time.sleep(0.1)
-                if attempt_i == max_attempts - 1:
-                    print(f'Max attempts done, using nominal position for point {i} in az')
-                    az_real_position = 5600
-
-        for attempt_i in range(max_attempts):
-            try:
-                el_real_position = el_motor.read_encoder()
-                break
-            except:
-                print('An error occurred while reading encoders')
-                time.sleep(0.1)
-                if attempt_i == max_attempts - 1:
-                    print(f'Max attempts done, using nominal position for point {i} in el')
-                    el_real_position =5601
+        az_real_position = az_motor.read_encoder()
+        el_real_position = el_motor.read_encoder()
                         
         real_position = (az_real_position, el_real_position)
 
