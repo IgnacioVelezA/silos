@@ -236,7 +236,7 @@ class stepper_motor:
             except:
                 print('An error occurred while reading encoders')
                 time.sleep(0.1)
-                if attempt_i == max_attempts - 1:
+                if attempt_i == attempts - 1:
                     print(f'Max attempts done, using nominal position for point {i} in az')
                     raw_angle = 5600 + bus_id          
 
