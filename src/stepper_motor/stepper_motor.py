@@ -307,12 +307,12 @@ if __name__ == '__main__':
 
     GPIO.cleanup()
     az_motor = stepper_motor(id = 1,speed=0, max_speed=400, acceleration=600)
-    az_motor.add_limit_switch(12,-90)
+    az_motor.add_limit_switch(12,-97)
     az_motor.add_limit_switch(22,97)#¬24¬22
     time.sleep(1)
 
     el_motor = stepper_motor(id = 2, speed=0, max_speed=400, acceleration=600)
-    el_motor.add_limit_switch(18,-44)
+    el_motor.add_limit_switch(18,-32)
     el_motor.add_limit_switch(23,32)#23
 
 

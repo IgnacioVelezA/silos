@@ -85,6 +85,9 @@ void readCommand(){
      moveMotor(*targetMotor, targetSteps);
      Serial.println("<"+String(targetMotorNumber)+"-ok:move-"+String(targetAngle)+">");
     }
+    else if (strcmp(recvCmd,"rdangle")==0){
+      float angle = readAngle(*targetMotor);
+      Serial.println("<"+String(targetMotorNumber)+"-ok:"+String(angle)+">");
     newData = false;  
   }   
 }
@@ -102,6 +105,12 @@ long angleToSteps(float angle){
 
 float stepsToAngle(long steps){
   float angle = steps*360.0/stepsPerLoop/targetReduction;
+  return angle;
+}
+
+float readAngle(AccelStepper &stepper){
+  long steps = stepper.currentPosition();
+  float angle = stepsToAngle(steps);
   return angle;
 }
 
