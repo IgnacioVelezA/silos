@@ -70,7 +70,7 @@ if __name__ == '__main__':
     # Defining wait time for radar
     radar_measure_wait_time = args.radar_wait_time
 
-    traj = [0,0] + trajectory.circle_path(10, 27,20)[1711:]
+    traj = [(0,0)] + trajectory.circle_path(10, 27,20)[1711:]
     #hex_trajectory.hex_trajectory(RADIO_BEAM, RADIO_SURFACE, set_offset_el=True, offset_elev_degree = 5.0)
 
     time.sleep(1)
