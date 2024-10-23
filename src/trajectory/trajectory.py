@@ -5,6 +5,8 @@ each tuple should have 2 elements, being the first one the azimuth angle and the
 """
 
 import math
+import numpy as np
+import matplotlib.pyplot as plt
 
 def standard13(max_angle):
     """
@@ -264,3 +266,20 @@ def circle_path(initial_circle_points, theta_max, n_levels):
     return return_list
 
 
+def plot_traj(trayectoria):
+    theta_list_rad = [value[1] * np.pi/180 for value in trayectoria]
+    phi_list_rad = [value[0] * np.pi/180 for value in trayectoria]
+
+    X = np.zeros(len(trayectoria))
+    Y = np.zeros(len(trayectoria))
+
+    for i in range(len(trayectoria)):
+        # X e Y están multiplicados por -1 mientras se hacen pruebas horizontales,
+        # para implementación final debe ser positivo
+        # theta = elevation; phi = azimutal
+        X[i] = np.sin(theta_list_rad[i]) * np.sin(phi_list_rad[i])
+        Y[i] = np.sin(theta_list_rad[i]) * np.cos(phi_list_rad[i])
+
+    plt.figure()
+    plt.scatter(X,Y)
+    plt.show()
