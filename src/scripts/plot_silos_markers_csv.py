@@ -7,6 +7,8 @@ import plotly.graph_objects as go
 import scipy.interpolate
 from scipy.spatial import Delaunay
 
+from matplotlib.widgets import Slider, TextBox
+from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 from shapely.geometry import point
 from src.scripts import distanceFinder, readcsv
 
@@ -137,114 +139,6 @@ def plot_curve(i, xs, thr, jump ,title = ''):
 #////END: plot_curve===============================================================================
 
 
-#////curveComparison===============================================================================
-def curveComparison(crvindx):
-    curve_og = curves[crvindx]
-    curve_mean = np.zeros_like(curve_og)
-
-    x = np.linspace(MINDISTANCE,MAXDISTANCE,128)
-
-    curve_mean[0] = (curve_og[0]+curve_og[1])/3
-    for i in range(len(curve_og)-2):
-        curve_mean[i+1] = (curve_og[i]+curve_og[i+1]+curve_og[i+2])/3 
-
-    i += 1
-    curve_mean[i+1] = (curve_og[i]+curve_og[i+1])/3
-
-    x_interpl = np.linspace(MINDISTANCE,MAXDISTANCE,2048)
-    xstep = x_interpl[1] - x_interpl[0]
-
-    xy_spline = scipy.interpolate.interp1d(x, curve_og)
-    mean_spline = scipy.interpolate.interp1d(x, curve_mean)
-
-    interpl_curve = xy_spline(x_interpl)
-    interpl_meancurve = mean_spline(x_interpl)
-
-    cubicSPCurve = scipy.interpolate.CubicSpline(x, curve_og)
-    pChipCurve = scipy.interpolate.PchipInterpolator(x, curve_og)    
-
-    max_og = np.argmax(curve_og)*int(2048/128)*xstep
-    max_cubic = np.argmax(cubicSPCurve(x_interpl))*xstep
-    max_pChip = np.argmax(pChipCurve(x_interpl))*xstep
-
-    print(max_og)
-    print(max_cubic)
-    print(max_pChip)
-
-    fig1 = plt.figure()
-    plt.plot(x, curve_og, 'k*')
-    plt.plot(x_interpl, interpl_curve, 'r')
-    plt.plot(x_interpl, interpl_meancurve, 'y')
-    plt.plot(x_interpl, cubicSPCurve(x_interpl), 'g')   
-    #plt.plot(x_interpl, pChipCurve(x_interpl), 'm')
-    
-    #plt.vlines(max_og,0,50,'k', label=f'original max')
-    #plt.vlines(max_cubic,0,50,'g', label=f'max w Cubic')
-    #plt.vlines(max_pChip,0,50,'b', label=f'max w pChip')
-
-    plt.xlabel('distance[m]')
-    plt.ylabel('Power')
-    plt.legend()
-    plt.show()
-#////END: curveComparison==========================================================================
-
-
-#////plotCut ======================================================================================
-def plotCut(XYZcoords, spline, xcut = False, ycut = False, step_angle = 3):
-    Xcoords, Ycoords, Zcoords = XYZcoords[spline]
-    n_points = len(Zcoords)  
-    Xcuts= []
-    Ycuts= []
-    Zcuts= []
-    indexCuts = []
-    if (xcut is False) and (ycut is False):
-        print ('Select at least one axis')
-        return False
-
-    elif not (xcut is False): #Fixed value of X then a cut parallel to y axis
-        for pi in range(n_points):
-            Xpi = Xcoords[pi]
-            if (Xpi <= xcut[1]) and (Xpi >= xcut[0]):
-                Xcuts.append(Xpi)
-                Ycuts.append(Ycoords[pi])
-                Zcuts.append(Zcoords[pi])
-                indexCuts.append(pi)
-
-    elif not (ycut is False): #Fixed value of X then a cut parallel to y axis
-        for pi in range(n_points):
-            Ypi = Ycoords[pi]
-            if (Ypi <= ycut[1]) and (Ypi >= ycut[0]):
-                Xcuts.append(Xcoords[pi])
-                Ycuts.append(Ypi)
-                Zcuts.append(Zcoords[pi])    
-                indexCuts.append(pi)
-
-    fig2 = go.Figure()
-    scatter = fig2.add_trace(go.Scatter3d(
-        x=Xcuts,
-        y=Ycuts,
-        z=Zcuts,
-        mode='markers',
-            marker=dict(
-            size=3,
-            color=Z,  # Usar la coordenada z como color
-            colorscale='Viridis',  # Colormap
-            colorbar=dict(title='Eje Z')
-        ),
-        text = indexCuts
-        ))
-
-    fig2.update_layout(scene=dict(
-        xaxis=dict(title='Eje X'),
-        yaxis=dict(title='Eje Y'),
-        zaxis=dict(title='Eje Z', range = [0, 30])
-        ),title = spline)
-        
-    fig2.show()
-    return Xcuts, Ycuts, Zcuts
-#////END: plotCut =================================================================================
-
-
 def correct_real_traj(traj_measured, traj_commanded, LS_positions):
     offset_LS_azimutal = LS_positions[0]
     offset_LS_elev = LS_positions[1]
@@ -358,23 +252,27 @@ def plot_with_encoder(phi_list, traj_measured,traj_commanded, distance_measureme
     return [X, Y, Z], real_traj_corr
 
 
-def tesselation(X,Y):
-    xypoints = []
+# def tesselation(X,Y):
+#     xypoints = []
 
-    for coord_i in range(len(X)):
-        xypoints.append([X[coord_i], Y[coord_i]])
-    #print(xypoints)
-    xypoints = np.array(xypoints)
-    tri = Delaunay(xypoints)
-    indices = tri.simplices
-    plt.triplot(xypoints[:,0], xypoints[:,1], tri.simplices)
-    #plt.plot(xypoints[:,0], xypoints[:,1])
+#     for coord_i in range(len(X)):
+#         xypoints.append([X[coord_i], Y[coord_i]])
+#     #print(xypoints)
+#     xypoints = np.array(xypoints)
+#     tri = Delaunay(xypoints)
+#     indices = tri.simplices
+#     plt.triplot(xypoints[:,0], xypoints[:,1], tri.simplices)
+#     #plt.plot(xypoints[:,0], xypoints[:,1])
 
-    #plt.scatter(vertices[:,0],vertices[:,1], marker = 'o')
+#     #plt.scatter(vertices[:,0],vertices[:,1], marker = 'o')
 
-    plt.show()
-    return xypoints, indices 
+#     plt.show()
+#     return xypoints, indices 
 
+def tesselation(xypoints):
+	tri = Delaunay(xypoints)
+	indices = tri.simplices
+	return indices
 
 def volumen_un_prisma(vertices2d, verticesZ):
 	
@@ -387,27 +285,63 @@ def volumen_un_prisma(vertices2d, verticesZ):
 	volumen = altura*area
 	return volumen
 
+def zcalculator(zvector, height_limit, bottom_limit, floor):
+    newzvector = np.zeros_like(zvector)
+    for zi in range(len(zvector)):
+        newz = min(zvector[zi], height_limit) - floor
+        newzvector[zi] = newz-max(bottom_limit,0)
+    return newzvector
 
-def volumen(X,Y,Z):
-    points, vertices_indexs = tesselation(X,Y)
-    altura = np.zeros_like(Z)
-    for Z_i in range(len(Z)):
-        if 6 - Z_i <= 0:
-            altura[Z_i] = 0 
-        else:
-            altura[Z_i] = 6-Z[Z_i]
-    altura = np.array(altura)
 
+def full_volume(pointsxy,z):
+    if not(pointsxy.any()):
+        print(0.0)
+        return 0.0
+
+    vertices_indexs = tesselation(pointsxy)
     volumen = 0
     for triangulo_i in range(len(vertices_indexs)):
-        vertices_triangulo_i = [points[vertice_iesimo] for vertice_iesimo in vertices_indexs[triangulo_i]]
-        alturas_triangulo_i = [altura[vertice_iesimo] for vertice_iesimo in vertices_indexs[triangulo_i]]
+        vertices_triangulo_i = [pointsxy[vertice_iesimo] for vertice_iesimo in vertices_indexs[triangulo_i]]
+        alturas_triangulo_i = [z[vertice_iesimo] for vertice_iesimo in vertices_indexs[triangulo_i]]
 
         vertices_triangulo_i = np.array(vertices_triangulo_i)
         alturas_triangulo_i = np.array(alturas_triangulo_i)
         volumen += volumen_un_prisma(vertices_triangulo_i, alturas_triangulo_i)
-   # print(altura)
-    return volumen
+
+    print(volumen)
+    return round(volumen,4)
+
+def plot_resizing_cube(x,y,z,xside, yside, zside, limits):
+    ax.cla()  # Clear the previous plot
+    x0,x1 = xside
+    y0,y1 = yside
+    bottom, height = zside
+    limitx, limity, limitz = limits
+    # Plot the dots within the specified width, depth, and height
+    mask = (x >= x0) & (x <= x1) & (y >= y0) & (y <= y1) & (z >= bottom) & (z <= height)
+    ax.scatter(x[mask], y[mask], z[mask], c='blue', alpha=0.6, label="Points inside Cube")
+    ax.scatter(x[~mask], y[~mask], z[~mask], c='grey', alpha=0.3, label="Points outside Cube")
+
+    # Cube vertices and faces
+    vertices = np.array([[x0, y0, bottom], [x1, y0, bottom], [x1, y1, bottom], [x0, y1, bottom],
+                         [x0, y0, height], [x1, y0, height], [x1, y1, height], [x0, y1, height]])
+
+    faces = [[vertices[j] for j in [0, 1, 2, 3]], [vertices[j] for j in [4, 5, 6, 7]], 
+             [vertices[j] for j in [0, 1, 5, 4]], [vertices[j] for j in [1, 2, 6, 5]],
+             [vertices[j] for j in [2, 3, 7, 6]], [vertices[j] for j in [3, 0, 4, 7]]]
+    
+    ax.add_collection3d(Poly3DCollection(faces, facecolors='cyan', linewidths=1, edgecolors='r', alpha=0.15))
+    ax.set_xlim(limitx[0], limitx[1])
+    ax.set_ylim(limity[0], limity[1])
+    ax.set_zlim(limitz[0], limitz[1])
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.set_zlabel('Z')
+    ax.legend(loc="upper right")
+
+    num_points_inside = np.sum(mask)
+    plt.draw()
+    return num_points_inside,mask
 
 
 if __name__=='__main__':
@@ -464,7 +398,101 @@ if __name__=='__main__':
 
     filename = filename + ' con Umbral ' + str(threshold)
     XYZcoords = plot_measure(theta_angles, phi_angles, distances[0], MINDISTANCE,MAXDISTANCE, titlei = filename)
-    XYZ_real, real_traj_corr = plot_with_encoder(phi_angles, real_traj, traj_angle, distances[0], MINDISTANCE,MAXDISTANCE, LS_positions,titlei =filename)
+    #XYZ_real, real_traj_corr = plot_with_encoder(phi_angles, real_traj, traj_angle, distances[0], MINDISTANCE,MAXDISTANCE, LS_positions,titlei =filename)
     #XYZsplines[titles[i]] = [X,Y,Z]
-    print(volumen(XYZcoords[0], XYZcoords[1], XYZcoords[2]))
+    #print(volumen(XYZcoords[0], XYZcoords[1], XYZcoords[2]))
     # curves[i][j] corresponds to the curve of the j-th point of the i-th iteration
+
+    ### ----------------------------------------------
+    fig3 = plt.figure()
+    ax = fig3.add_subplot(111, projection='3d')
+
+    x,y,z=XYZcoords[0], XYZcoords[1], XYZcoords[2]
+
+    initial_X1 = initial_Y1 =  round(max(max(x),max(y)),4)
+    initial_height = 0
+    initial_X0 = initial_Y0 = initial_bottom = round(min(min(x),min(y)),4)
+    initial_bottom = min(z)
+    plot_side= round(max(max(x),max(y)) - min(min(x),min(y)),4)
+
+    initial_xside = [initial_X0, initial_X1]
+    initial_yside = [initial_Y0, initial_Y1]
+    initial_zside = [initial_bottom, initial_height]
+    limits = [initial_xside, initial_yside, initial_zside]
+    # Initial plot of the points and cube
+    initial_num_points_inside, mask = plot_resizing_cube(x,y,z,initial_xside, initial_yside, initial_zside, limits)
+    initial_points_inside = np.zeros([initial_num_points_inside,2])
+    initial_points_inside[:,0] = x[mask]
+    initial_points_inside[:,1] = y[mask]
+    initial_z_inside = z[mask]
+
+
+    initial_z_inside_adjust = zcalculator(initial_z_inside, initial_height, initial_bottom, initial_bottom)
+    initial_volume_inside = full_volume(initial_points_inside,initial_z_inside)
+    # Add height slider
+    axheight = plt.axes([0.25, 0.08, 0.65, 0.03], facecolor='lightgoldenrodyellow')
+    height_slider = Slider(axheight, 'Height', initial_bottom+0.5, 0, valinit=initial_height)
+    # Add bottom slider
+    axbottom = plt.axes([0.25, 0.04, 0.65, 0.03], facecolor='lightgoldenrodyellow')
+    bottom_slider = Slider(axbottom, 'bottom', initial_bottom-0.5, -0.5, valinit=initial_bottom, slidermax = height_slider)
+
+    # Add width and depth text boxes
+    axX0box = plt.axes([0.1, 0.3, 0.05, 0.05])
+    X0_textbox = TextBox(axX0box, 'X0', initial=str(initial_X0))
+
+    # Add width and depth text boxes
+    axX1box = plt.axes([0.2, 0.3, 0.05, 0.05])
+    X1_textbox = TextBox(axX1box, 'X1', initial=str(initial_X1))
+
+    # Add width and depth text boxes
+    axY0box = plt.axes([0.1, 0.4, 0.05, 0.05])
+    Y0_textbox = TextBox(axY0box, 'Y0', initial=str(initial_Y0))
+
+    # Add width and depth text boxes
+    axY1box = plt.axes([0.2, 0.4, 0.05, 0.05])
+    Y1_textbox = TextBox(axY1box, 'Y1', initial=str(initial_Y1))
+
+    # Add a textbox to display the count of points inside the cube
+    axcountbox = plt.axes([0.1, 0.5, 0.1, 0.05])
+    count_textbox = TextBox(axcountbox, 'Points Inside', initial=str(initial_num_points_inside))
+    count_textbox.set_active(False)  # Make the textbox read-only
+
+    # Add a textbox to display the count of points inside the cube
+    axvolumebox = plt.axes([0.1, 0.6, 0.1, 0.05])
+    volume_textbox = TextBox(axvolumebox, 'volume Inside', initial=str(initial_volume_inside))
+    volume_textbox.set_active(False)  # Make the textbox read-only
+
+    # Update function to adjust plot based on inputs
+    def update(val):
+        X0 = float(X0_textbox.text)
+        X1 = float(X1_textbox.text)
+        Y0 = float(Y0_textbox.text)
+        Y1 = float(Y1_textbox.text)
+        xside = [X0,X1]
+        yside = [Y0, Y1]
+        height = height_slider.val
+        bottom = bottom_slider.val
+        zside = [bottom, height]
+        height_slider.slidermin = bottom_slider
+        bottom_slider.slidermax = height_slider
+        num_points_inside, mask= plot_resizing_cube(x,y,z,xside, yside,zside, limits)
+
+        points_inside = np.zeros([num_points_inside, 2])
+        points_inside[:,0] = x[mask]
+        points_inside[:,1] = y[mask]
+        z_updated = zcalculator(z[mask], height, bottom, initial_bottom)
+        volume =full_volume(points_inside,z_updated)
+
+        count_textbox.set_val(str(num_points_inside))
+        volume_textbox.set_val(str(volume))
+
+
+    # Attach the update function to slider and text boxes
+    height_slider.on_changed(update)
+    X0_textbox.on_submit(update)
+    X1_textbox.on_submit(update)
+    Y0_textbox.on_submit(update)
+    Y1_textbox.on_submit(update)
+    bottom_slider.on_changed(update)
+
+    plt.show()
