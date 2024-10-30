@@ -7,7 +7,7 @@ import plotly.graph_objects as go
 import scipy.interpolate
 from scipy.spatial import Delaunay
 
-from matplotlib.widgets import Slider, TextBox
+from matplotlib.widgets import Slider, TextBox, Button, CheckButtons
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 from shapely.geometry import point
 from src.scripts import distanceFinder, readcsv
@@ -20,7 +20,7 @@ angulo_zero = 0#30*np.pi/180
 
 
 #////plot_measure==================================================================================
-def plot_measure(theta_list, phi_list, distance_measurements, minAxis, maxAxis, titlei = False):
+def plot_measure(theta_list, phi_list, distance_measurements, minAxis, maxAxis, titlei = False, plotornotplot = True):
     theta_list_rad = [value * np.pi/180 for value in theta_list]
     phi_list_rad = [value * np.pi/180 for value in phi_list]
 
@@ -49,90 +49,92 @@ def plot_measure(theta_list, phi_list, distance_measurements, minAxis, maxAxis, 
 
         vertices[i] = np.array([X[i], Y[i], Z[i]])
 
+    if plotornotplot:
     # Configures the figure based on the chosen visualization
-    fig = go.Figure()
+        fig = go.Figure()
 
-    scatter = fig.add_trace(go.Scatter3d(
-        x=X,
-        y=Y,
-        z=Z,
-        mode='markers',
-            marker=dict(
-            size=3,
-            color=Z,  # Usar la coordenada z como color
-            colorscale='Viridis',  # Colormap
-            colorbar=dict(title='Eje Z')
-        ),
-        text = index
-        ))
+        scatter = fig.add_trace(go.Scatter3d(
+            x=X,
+            y=Y,
+            z=Z,
+            mode='markers',
+                marker=dict(
+                size=3,
+                color=Z,  # Usar la coordenada z como color
+                colorscale='Viridis',  # Colormap
+                colorbar=dict(title='Eje Z')
+            ),
+            text = index
+            ))
 
-    fig.update_layout(scene=dict(
-        xaxis=dict(title='Eje X'),
-        yaxis=dict(title='Eje Y'),
-        zaxis=dict(title='Eje Z', range = [-maxAxis,minAxis]),
-        ),title = titlei)
-        
-#fig.colorbar(scatter, shrink=0.5, aspect=5, label = "Distance [m]")
+        fig.update_layout(scene=dict(
+            xaxis=dict(title='Eje X'),
+            yaxis=dict(title='Eje Y'),
+            zaxis=dict(title='Eje Z', range = [-maxAxis,minAxis]),
+            ),title = titlei)
+            
+    #fig.colorbar(scatter, shrink=0.5, aspect=5, label = "Distance [m]")
 
-    fig.show()
+        fig.show()
 
-    while True:
-        mark = input('Indice (just enter to break):')
-        if mark:
-            #if mark == x:
-            indxMark = int(mark)
-            fig = go.Figure()
-            scatter = fig.add_trace(go.Scatter3d(
-                x=X,
-                y=Y,
-                z=Z,
-                mode='markers',
-                    marker=dict(
-                    size=3,
-                    color=Z,  # Usar la coordenada z como color
-                    colorscale='Viridis',  # Colormap
-                    colorbar=dict(title='Eje Z')
-                ),
-                text = index
-                ))
-            scatter = fig.add_trace(go.Scatter3d(
-                x=[X[indxMark]],
-                y=[Y[indxMark]],
-                z=[Z[indxMark]],
-                mode='markers',
-                    marker=dict(
-                    size=3,
-                    color='red'
-                ),
-                text = mark
-                ))
+        while True:
+            mark = input('Indice (just enter to break):')
+            if mark:
+                #if mark == x:
+                indxMark = int(mark)
+                fig = go.Figure()
+                scatter = fig.add_trace(go.Scatter3d(
+                    x=X,
+                    y=Y,
+                    z=Z,
+                    mode='markers',
+                        marker=dict(
+                        size=3,
+                        color=Z,  # Usar la coordenada z como color
+                        colorscale='Viridis',  # Colormap
+                        colorbar=dict(title='Eje Z')
+                    ),
+                    text = index
+                    ))
+                scatter = fig.add_trace(go.Scatter3d(
+                    x=[X[indxMark]],
+                    y=[Y[indxMark]],
+                    z=[Z[indxMark]],
+                    mode='markers',
+                        marker=dict(
+                        size=3,
+                        color='red'
+                    ),
+                    text = mark
+                    ))
 
-                # fig.update_layout(scene=dict(
-                #     xaxis=dict(title='Eje X'),
-                #     yaxis=dict(title='Eje Y'),
-                #     zaxis=dict(title='Eje Z', range = [minAxis, maxAxis]),
-                #     ),title = titlei)
+                    # fig.update_layout(scene=dict(
+                    #     xaxis=dict(title='Eje X'),
+                    #     yaxis=dict(title='Eje Y'),
+                    #     zaxis=dict(title='Eje Z', range = [minAxis, maxAxis]),
+                    #     ),title = titlei)
 
-            fig.show()
-        else:
-            break
+                fig.show()
+            else:
+                break
     return [X,Y,Z]
 #////END: plot_measure=============================================================================
 
 
 #////plot_curve====================================================================================
-def plot_curve(i, xs, thr, jump ,title = ''):
+def plot_curve(i, xs, thr, jump):
     curve = curves[i]
     distance, cleaned_curve, x_interpl= distanceFinder.distanceSplines(curve, thr ,MINDISTANCE,MAXDISTANCE, jump)
     z = np.cos(theta_angles[i]*np.pi/180)*distance
+    title = f'Punto {i} threshold {thr}, salto de {jump}m'
 
-
-    plt.plot(xs, curve)
-    plt.plot(x_interpl, cleaned_curve)
+    figc = plt.figure()
+    plotcurve = plt.plot(xs, curve)
+    plotcl = plt.plot(x_interpl, cleaned_curve)
     plt.vlines(distance,0,50, label=f'radial={distance}')
     plt.xlabel('distance[m]')
     plt.ylabel('Power')
-    plt.title(f'{title}, z = {z}')
+    plt.title(f'{title}')
     plt.legend()
     plt.show()
     return cleaned_curve
@@ -252,23 +254,6 @@ def plot_with_encoder(phi_list, traj_measured,traj_commanded, distance_measureme
     return [X, Y, Z], real_traj_corr
 
 
-# def tesselation(X,Y):
-#     xypoints = []
-
-#     for coord_i in range(len(X)):
-#         xypoints.append([X[coord_i], Y[coord_i]])
-#     #print(xypoints)
-#     xypoints = np.array(xypoints)
-#     tri = Delaunay(xypoints)
-#     indices = tri.simplices
-#     plt.triplot(xypoints[:,0], xypoints[:,1], tri.simplices)
-#     #plt.plot(xypoints[:,0], xypoints[:,1])
-
-#     #plt.scatter(vertices[:,0],vertices[:,1], marker = 'o')
-
-#     plt.show()
-#     return xypoints, indices 
-
 def tesselation(xypoints):
 	tri = Delaunay(xypoints)
 	indices = tri.simplices
@@ -295,7 +280,6 @@ def zcalculator(zvector, height_limit, bottom_limit, floor):
 
 def full_volume(pointsxy,z):
     if not(pointsxy.any()):
-        print(0.0)
         return 0.0
 
     vertices_indexs = tesselation(pointsxy)
@@ -308,7 +292,6 @@ def full_volume(pointsxy,z):
         alturas_triangulo_i = np.array(alturas_triangulo_i)
         volumen += volumen_un_prisma(vertices_triangulo_i, alturas_triangulo_i)
 
-    print(volumen)
     return round(volumen,4)
 
 def plot_resizing_cube(x,y,z,xside, yside, zside, limits):
@@ -319,8 +302,8 @@ def plot_resizing_cube(x,y,z,xside, yside, zside, limits):
     limitx, limity, limitz = limits
     # Plot the dots within the specified width, depth, and height
     mask = (x >= x0) & (x <= x1) & (y >= y0) & (y <= y1) & (z >= bottom) & (z <= height)
-    ax.scatter(x[mask], y[mask], z[mask], c='blue', alpha=0.6, label="Points inside Cube")
-    ax.scatter(x[~mask], y[~mask], z[~mask], c='grey', alpha=0.3, label="Points outside Cube")
+    scat1 = ax.scatter(x[mask], y[mask], z[mask], c='blue', alpha=0.9, label="Points inside Cube")
+    scat2 = ax.scatter(x[~mask], y[~mask], z[~mask], c=z[~mask], alpha=1, cmap="rainbow_r")
 
     # Cube vertices and faces
     vertices = np.array([[x0, y0, bottom], [x1, y0, bottom], [x1, y1, bottom], [x0, y1, bottom],
@@ -341,8 +324,19 @@ def plot_resizing_cube(x,y,z,xside, yside, zside, limits):
 
     num_points_inside = np.sum(mask)
     plt.draw()
-    return num_points_inside,mask
+    return scat1, scat2, num_points_inside,mask
 
+
+# Event handler to print coordinats of clicked points
+def on_pick(event):
+    if (event.artist != scat1)&(event.artist != scat2):
+        print('ñe')
+        return    
+    ind = event.ind[0]  # Index of the picked point
+    print(f"Clicked point coordinates: ({x[ind]:.2f}, {y[ind]:.2f}, {z[ind]:.2f}, ind:{ind})")
+
+def on_button_click(event, point2plot):
+    plot_curve(point2plot, xs,0,0)
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser(description='plots a silos measurement'+
@@ -398,7 +392,7 @@ if __name__=='__main__':
 
     filename = filename + ' con Umbral ' + str(threshold)
     XYZcoords = plot_measure(theta_angles, phi_angles, distances[0], MINDISTANCE,MAXDISTANCE, titlei = filename)
-    #XYZ_real, real_traj_corr = plot_with_encoder(phi_angles, real_traj, traj_angle, distances[0], MINDISTANCE,MAXDISTANCE, LS_positions,titlei =filename)
+    XYZ_real, real_traj_corr = plot_with_encoder(phi_angles, real_traj, traj_angle, distances[0], MINDISTANCE,MAXDISTANCE, LS_positions,titlei =filename)
     #XYZsplines[titles[i]] = [X,Y,Z]
     #print(volumen(XYZcoords[0], XYZcoords[1], XYZcoords[2]))
     # curves[i][j] corresponds to the curve of the j-th point of the i-th iteration
@@ -407,7 +401,7 @@ if __name__=='__main__':
     fig3 = plt.figure()
     ax = fig3.add_subplot(111, projection='3d')
 
-    x,y,z=XYZcoords[0], XYZcoords[1], XYZcoords[2]
+    x,y,z=plot_measure(theta_angles, phi_angles, distances[0], MINDISTANCE,MAXDISTANCE, titlei = filename, plotornotplot=False)#XYZcoords[0], XYZcoords[1], XYZcoords[2]
 
     initial_X1 = initial_Y1 =  round(max(max(x),max(y)),4)
     initial_height = 0
@@ -420,7 +414,7 @@ if __name__=='__main__':
     initial_zside = [initial_bottom, initial_height]
     limits = [initial_xside, initial_yside, initial_zside]
     # Initial plot of the points and cube
-    initial_num_points_inside, mask = plot_resizing_cube(x,y,z,initial_xside, initial_yside, initial_zside, limits)
+    scat1, scat2, initial_num_points_inside, mask = plot_resizing_cube(x,y,z,initial_xside, initial_yside, initial_zside, limits)
     initial_points_inside = np.zeros([initial_num_points_inside,2])
     initial_points_inside[:,0] = x[mask]
     initial_points_inside[:,1] = y[mask]
@@ -428,13 +422,19 @@ if __name__=='__main__':
 
 
     initial_z_inside_adjust = zcalculator(initial_z_inside, initial_height, initial_bottom, initial_bottom)
-    initial_volume_inside = full_volume(initial_points_inside,initial_z_inside)
+    initial_volume_inside = full_volume(initial_points_inside,initial_z_inside_adjust)
+
+    initial_point2plot = 0
+
     # Add height slider
-    axheight = plt.axes([0.25, 0.08, 0.65, 0.03], facecolor='lightgoldenrodyellow')
+    axheight = plt.axes([0.25, 0.09, 0.65, 0.03], facecolor='lightgoldenrodyellow')
     height_slider = Slider(axheight, 'Height', initial_bottom+0.5, 0, valinit=initial_height)
     # Add bottom slider
-    axbottom = plt.axes([0.25, 0.04, 0.65, 0.03], facecolor='lightgoldenrodyellow')
+    axbottom = plt.axes([0.25, 0.06, 0.65, 0.03], facecolor='lightgoldenrodyellow')
     bottom_slider = Slider(axbottom, 'bottom', initial_bottom-0.5, -0.5, valinit=initial_bottom, slidermax = height_slider)
+
+    axumbral = plt.axes([0.25, 0.03, 0.65, 0.03], facecolor='lightgoldenrodyellow')
+    umbral_slider = Slider(axumbral, 'Umbral', 0, 30,valinit=0)
 
     # Add width and depth text boxes
     axX0box = plt.axes([0.1, 0.3, 0.05, 0.05])
@@ -462,20 +462,50 @@ if __name__=='__main__':
     volume_textbox = TextBox(axvolumebox, 'volume Inside', initial=str(initial_volume_inside))
     volume_textbox.set_active(False)  # Make the textbox read-only
 
+    # Add width and depth text boxes
+    axpointbox = plt.axes([0.8, 0.6, 0.05, 0.05], label = 'aaaa')
+    point_textbox = TextBox(axpointbox, 'Point selected', initial=str(initial_point2plot))
+    point2plot = initial_point2plot
+
+
+    # Add a textbox to display the count of points inside the cube
+    axcubebuttonbox = plt.axes([0.1, 0.7, 0.05, 0.05], facecolor="grey")
+    volumen_checkbutton = CheckButtons(axcubebuttonbox, ' ', [False])
+    #check_text = plt.text(0.1, 0.75, 'Calculate Volumen')
+
+    # Add a textbox to display the count of points inside the cube
+    axbuttonbox = plt.axes([0.8, 0.4, 0.1, 0.05])
+    plot_button = Button(axbuttonbox, 'Plot Curve')
     # Update function to adjust plot based on inputs
+    DoIntegrate = False
+
     def update(val):
+        global scat1, scat2, point2plot 
         X0 = float(X0_textbox.text)
         X1 = float(X1_textbox.text)
         Y0 = float(Y0_textbox.text)
         Y1 = float(Y1_textbox.text)
+        point2plot = int(point_textbox.text)
         xside = [X0,X1]
         yside = [Y0, Y1]
         height = height_slider.val
         bottom = bottom_slider.val
+        umbral = umbral_slider.val
+
         zside = [bottom, height]
         height_slider.slidermin = bottom_slider
         bottom_slider.slidermax = height_slider
-        num_points_inside, mask= plot_resizing_cube(x,y,z,xside, yside,zside, limits)
+
+        for j in range(n_points):
+            distances[0][j], _, _ = distanceFinder.distanceSplines(curves[j], umbral,MINDISTANCE,MAXDISTANCE, 5, 1)
+
+        x,y,z = plot_measure(theta_angles, phi_angles, distances[0], MINDISTANCE,MAXDISTANCE, titlei = filename, plotornotplot=False)#XYZcoords[0], XYZcoords[1], XYZcoords[2]
+
+        #if DoIntegrate:
+        scat1, scat2, num_points_inside, mask= plot_resizing_cube(x,y,z,xside, yside,zside, limits)
+        fig3.canvas.mpl_connect("pick_event", on_pick)
+        scat1.set_picker(True)
+        scat2.set_picker(True)
 
         points_inside = np.zeros([num_points_inside, 2])
         points_inside[:,0] = x[mask]
@@ -486,7 +516,6 @@ if __name__=='__main__':
         count_textbox.set_val(str(num_points_inside))
         volume_textbox.set_val(str(volume))
 
-
     # Attach the update function to slider and text boxes
     height_slider.on_changed(update)
     X0_textbox.on_submit(update)
@@ -494,5 +523,15 @@ if __name__=='__main__':
     Y0_textbox.on_submit(update)
     Y1_textbox.on_submit(update)
     bottom_slider.on_changed(update)
+    umbral_slider.on_changed(update)
+    point_textbox.on_submit(update)
+    volumen_checkbutton.on_clicked(lambda x: print('ok'))
+    plot_button.on_clicked(lambda x: on_button_click(x, point2plot))
+    # Connect the event for printing point coordinates on click
+    fig3.canvas.mpl_connect("pick_event", on_pick)
 
+    # Enable point picking on scatter plot
+    scat1.set_picker(True)
+
+    scat2.set_picker(True)
     plt.show()
