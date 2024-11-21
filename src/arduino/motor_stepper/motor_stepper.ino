@@ -16,7 +16,7 @@ AccelStepper azStepper(motorInterfaceType, azStepPin, azDirPin);
 AccelStepper elStepper(motorInterfaceType, elStepPin, elDirPin);
 
 // Define stepper reduction
-const int azStepperReduction = 100;
+const int azStepperReduction = 50;
 const int elStepperReduction = 100;
 
 // Variable for defining reduction

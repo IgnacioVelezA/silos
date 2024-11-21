@@ -8,6 +8,16 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 
+
+def max_level(rbeam, rmax):
+    """
+    Number of levels 0,1,...,n given scanning radius and beam radius
+    """
+    n = (np.floor(rmax/rbeam)-1)/2
+    return int(np.ceil(n) +1)
+
+
+
 def standard13(max_angle):
     """
     Returns a tuple list with az and el points to measure, max_angle corresponds
@@ -265,6 +275,9 @@ def circle_path(initial_circle_points, theta_max, n_levels):
 
     return return_list
 
+def circle_path_2(radiobeam, radiomax):
+    trajectory = [(0,0)]
+    max_level = max_level(radio)
 
 def plot_traj(trayectoria):
     theta_list_rad = [value[1] * np.pi/180 for value in trayectoria]

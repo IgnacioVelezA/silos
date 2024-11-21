@@ -39,8 +39,8 @@ def plot_measure(theta_list, phi_list, distance_measurements, minAxis, maxAxis, 
         # X e Y están multiplicados por -1 mientras se hacen pruebas horizontales,
         # para implementación final debe ser positivo
         # theta = elevation; phi = azimutal
-        X[i] = np.sin(theta_list_rad[i]) * np.sin(phi_list_rad[i]) * (distance_centered[i]+0.01)
-        Y[i] = np.sin(theta_list_rad[i]) * np.cos(phi_list_rad[i]) * (distance_centered[i]+0.01)
+        X[i] = np.sin(theta_list_rad[i]) * np.sin(phi_list_rad[i]) * (distance_centered[i])
+        Y[i] = np.sin(theta_list_rad[i]) * np.cos(phi_list_rad[i]) * (distance_centered[i])
         Z[i] = -distance_centered[i]*np.cos(theta_list_rad[i])
         index[i] = f'punto {i}; elev: {theta_list[i]}; azi: {phi_list[i]}; rawdist = {distance_measurements[i]}'
 
