@@ -116,7 +116,7 @@ if __name__ == '__main__':
     time.sleep(0.1)
     az_motor.move(0)
 
-    el_motor.initialization(dir=1, speed=0, max_speed=400, acceleration=600) 
+    el_motor.initialization(dir=1, speed=0, max_speed=600, acceleration=700) 
     while not el_motor.is_initialized:
         time.sleep(MOTOR_STATUS_POLLING_TIME)
     time.sleep(0.1)
