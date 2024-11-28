@@ -277,8 +277,17 @@ def circle_path(initial_circle_points, theta_max, n_levels):
 
 def circle_path_2(radiobeam, radiomax):
     trajectory = [(0,0)]
-    max_level = max_level(radio)
-
+    max_level = max_level(radiobeam, radiomax)
+    initial_azim_i = 0
+    for ring_i in range(max_level):
+        ring_i = ring_i+1
+        elev_i = ring_i*radiobeam
+        num_of_points_i = 2*np.pi*ring_i
+        initial_azim_i = initial_azim_i + radiobeam
+        for point_ji in range(num_of_points_i):
+            azim_ji = initial_azim_i + radiobeam*point_ji
+            if 
+            
 def plot_traj(trayectoria):
     theta_list_rad = [value[1] * np.pi/180 for value in trayectoria]
     phi_list_rad = [value[0] * np.pi/180 for value in trayectoria]
